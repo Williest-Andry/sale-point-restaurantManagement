@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -16,10 +17,13 @@ public class IngredientController {
     IngredientDAO ingredientDAO = new IngredientDAO(new DataSource());
 
     @GetMapping("/ingredients")
-    public ResponseEntity<List<Ingredient>> getIngredients() {
+    public ResponseEntity<List<Ingredient>> getIngredients(@RequestParam(required = false) Integer priceMinFilter, @RequestParam(required = false) Integer priceMaxFilter) {
+        List<Ingredient> ingredients = ingredientDAO.findAll(1,5).stream()
+                .filter(ingredient -> ingredient.getUnitPrice() >= priceMinFilter && ingredient.getUnitPrice() <= priceMaxFilter)
+                .toList();
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ingredientDAO.findAll(1,5));
+                .body(ingredients);
     }
 
     @GetMapping("/ingredients/{id}")
