@@ -89,17 +89,37 @@ public class IngredientDAO implements EntityDAO<Ingredient> {
     @Override
     public List<Ingredient> findAll(int page, int size) {
         List<Ingredient> ingredients = new ArrayList<>();
-        Ingredient ingredient = null;
+        String sqlRequest = new StringBuilder()
+                .append("SELECT ingredient.id as ingredient_id, name, latest_modification, amount as unit_price, ingredient.unit, ")
+                .append("SUM(ingredient_quantity) as entree_quantity FROM ingredient ")
+                .append("INNER JOIN price ON price.ingredient_id = ingredient.id ")
+                .append("INNER JOIN ingredient_move ON ingredient_move.ingredient_id = ingredient.id ")
+                .append("WHERE move_date <= ? AND type = 'entree' AND price.begin_date <= ? ").toString();
 
-        try (Connection dbConnection = dataSource.getConnection();) {
-            String sqlRequest = "SELECT ingredient.id, name, latest_modification, amount, unit FROM ingredient " +
-                    "INNER JOIN price ON price.ingredient_id = ingredient.id; ";
-            PreparedStatement selectAll = dbConnection.prepareStatement(sqlRequest);
-            ResultSet rs = selectAll.executeQuery();
+        sqlRequest += " GROUP BY ingredient.id, name, latest_modification, amount, ingredient.unit, price.begin_date " +
+                "ORDER BY price.begin_date;";
 
-        }
-        catch (SQLException e) {
+        try (Connection dbConnection = dataSource.getConnection();
+             PreparedStatement selectIngredient = dbConnection.prepareStatement(sqlRequest);) {
+            selectIngredient.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+            selectIngredient.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
 
+            try (ResultSet rs = selectIngredient.executeQuery()) {
+                while (rs.next()) {
+                    Ingredient ingredient = new Ingredient(
+                            rs.getString("name"),
+                            rs.getTimestamp("latest_modification").toLocalDateTime(),
+                            rs.getDouble("unit_price"),
+                            Unit.valueOf(rs.getString("unit"))
+                    );
+                    ingredient.setId(rs.getInt("ingredient_id"));
+                    ingredient.setStorageTotalIngredient(rs.getDouble("entree_quantity"));
+                    ingredient.setUsedTotalIngredient(this.getTotalUsedIngredient(rs.getLong("ingredient_id"), null));
+                    ingredients.add(ingredient);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR IN FIND ALL INGREDIENTS : " + e);
         }
         return ingredients;
     }
