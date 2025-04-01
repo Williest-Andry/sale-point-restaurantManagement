@@ -1,4 +1,4 @@
-package com.williest.td2springbootrestaurant.dao;
+package com.williest.td2springbootrestaurant.repository;
 
 import com.williest.td2springbootrestaurant.entity.Dish;
 import com.williest.td2springbootrestaurant.entity.Ingredient;
@@ -11,18 +11,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DishDAO implements EntityDAO<Dish> {
-    private DataSource dataSource;
+    private CustomDataSource customDataSource;
 
-    public DishDAO(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public DishDAO(CustomDataSource customDataSource) {
+        this.customDataSource = customDataSource;
     }
 
     @Override
     public Dish findById(long id , LocalDateTime chosenDate, LocalDateTime moveDate) {
         Dish dish = null;
-        IngredientDAO ingredientDAO = new IngredientDAO(dataSource);
+        IngredientDAO ingredientDAO = new IngredientDAO(customDataSource);
 
-        try (Connection dbConnection = dataSource.getConnection()){
+        try (Connection dbConnection = customDataSource.getConnection()){
             String sqlRequest = "SELECT dish_id, dish.name as dish_name, dish.unit_price as dish_unit_price, ingredient_id, " +
                     "ingredient.name, ingredient_quantity FROM dish_ingredient " +
                     "INNER JOIN dish ON dish.id = dish_id INNER JOIN ingredient ON ingredient.id = ingredient_id " +
@@ -53,9 +53,9 @@ public class DishDAO implements EntityDAO<Dish> {
     public List<Dish> findAll(int page, int size) {
         List<Dish> dishes = new ArrayList<>();
         Dish dish = null;
-        IngredientDAO ingredientDAO = new IngredientDAO(dataSource);
+        IngredientDAO ingredientDAO = new IngredientDAO(customDataSource);
 
-        try (Connection dbConnection = dataSource.getConnection()){
+        try (Connection dbConnection = customDataSource.getConnection()){
             String sqlRequest = "SELECT dish_id, dish.name as dish_name, dish.unit_price as dish_unit_price, ingredient_id, " +
                     "ingredient.name, ingredient_quantity FROM dish_ingredient " +
                     "INNER JOIN dish ON dish.id = dish_id INNER JOIN ingredient ON ingredient.id = ingredient_id ";

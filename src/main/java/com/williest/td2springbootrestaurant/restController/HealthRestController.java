@@ -1,4 +1,4 @@
-package com.williest.td2springbootrestaurant.controller;
+package com.williest.td2springbootrestaurant.restController;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

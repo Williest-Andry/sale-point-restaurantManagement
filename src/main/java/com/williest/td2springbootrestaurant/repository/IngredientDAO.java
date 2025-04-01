@@ -1,7 +1,8 @@
-package com.williest.td2springbootrestaurant.dao;
+package com.williest.td2springbootrestaurant.repository;
 
 import com.williest.td2springbootrestaurant.entity.Ingredient;
 import com.williest.td2springbootrestaurant.entity.Unit;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -9,11 +10,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Repository
 public class IngredientDAO implements EntityDAO<Ingredient> {
-    private DataSource dataSource;
+    private final CustomDataSource customDataSource;
 
-    public IngredientDAO(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public IngredientDAO(CustomDataSource customDataSource) {
+        this.customDataSource = customDataSource;
     }
 
     public Double getTotalUsedIngredient (long id , LocalDateTime storageStateDate) {
@@ -22,7 +24,7 @@ public class IngredientDAO implements EntityDAO<Ingredient> {
                 " INNER JOIN ingredient_move ON ingredient.id = ingredient_move.ingredient_id " +
                 " WHERE ingredient.id = ? AND move_date <= ? AND type = 'sortie';";
 
-        try (Connection dbConnection = dataSource.getConnection()) {
+        try (Connection dbConnection = customDataSource.getConnection()) {
             PreparedStatement select = dbConnection.prepareStatement(sqlRequest);
             select.setLong(1, id);
             select.setTimestamp(2, Timestamp.valueOf(storageStateDate != null ? storageStateDate : LocalDateTime.now()));
@@ -41,6 +43,7 @@ public class IngredientDAO implements EntityDAO<Ingredient> {
 
     @Override
     public Ingredient findById(long id , LocalDateTime priceBeginDate, LocalDateTime storageStateDate) {
+        Ingredient ingredient = null;
         String sqlRequest = new StringBuilder()
                 .append("SELECT ingredient.id, name, latest_modification, amount as unit_price, ingredient.unit, ")
                 .append("SUM(ingredient_quantity) as entree_quantity FROM ingredient ")
@@ -55,7 +58,7 @@ public class IngredientDAO implements EntityDAO<Ingredient> {
         sqlRequest += "GROUP BY ingredient.id, name, latest_modification, amount, ingredient.unit, price.begin_date " +
                 "ORDER BY price.begin_date DESC LIMIT 1";
 
-        try (Connection dbConnection = dataSource.getConnection();
+        try (Connection dbConnection = customDataSource.getConnection();
              PreparedStatement selectIngredient = dbConnection.prepareStatement(sqlRequest);) {
             selectIngredient.setLong(1, id);
             selectIngredient.setTimestamp(2, Timestamp.valueOf(storageStateDate != null ? storageStateDate : LocalDateTime.now()));
@@ -66,7 +69,7 @@ public class IngredientDAO implements EntityDAO<Ingredient> {
 
             try (ResultSet rs = selectIngredient.executeQuery()) {
                 if (rs.next()) {
-                    Ingredient ingredient = new Ingredient(
+                    ingredient = new Ingredient(
                             rs.getString("name"),
                             rs.getTimestamp("latest_modification").toLocalDateTime(),
                             rs.getDouble("unit_price"),
@@ -75,15 +78,15 @@ public class IngredientDAO implements EntityDAO<Ingredient> {
                     ingredient.setId(rs.getInt("id"));
                     ingredient.setStorageTotalIngredient(rs.getDouble("entree_quantity"));
                     ingredient.setUsedTotalIngredient(this.getTotalUsedIngredient(id, storageStateDate));
-                    return ingredient;
                 }
                 else{
-                    throw new RuntimeException("priceBeginDate: " + priceBeginDate+" or storageStateDate: " +storageStateDate +" doesn't exist");
+                    throw new RuntimeException("ingredient with id: "+id+" doesn't exist!");
                 }
             }
         } catch (SQLException e) {
             throw new RuntimeException("ERROR IN FIND INGREDIENT BY ID : " + e);
         }
+        return ingredient;
     }
 
     @Override
@@ -99,7 +102,7 @@ public class IngredientDAO implements EntityDAO<Ingredient> {
         sqlRequest += " GROUP BY ingredient.id, name, latest_modification, amount, ingredient.unit, price.begin_date " +
                 "ORDER BY price.begin_date;";
 
-        try (Connection dbConnection = dataSource.getConnection();
+        try (Connection dbConnection = customDataSource.getConnection();
              PreparedStatement selectIngredient = dbConnection.prepareStatement(sqlRequest);) {
             selectIngredient.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
             selectIngredient.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
@@ -126,7 +129,7 @@ public class IngredientDAO implements EntityDAO<Ingredient> {
 
     @Override
     public Ingredient save(Ingredient entity) {
-        return null;
+        throw new RuntimeException("not implemented");
     }
 
     @Override
@@ -211,7 +214,7 @@ public class IngredientDAO implements EntityDAO<Ingredient> {
             }
         }
 
-        try (Connection dbConnection = dataSource.getConnection()){
+        try (Connection dbConnection = customDataSource.getConnection()){
             String sqlRequest = sqlRequestSelect + sqlRequestCondition + " ORDER BY ? LIMIT ? OFFSET ?;";
             PreparedStatement selectIngredients = dbConnection.prepareStatement(sqlRequest);
             selectIngredients.setTimestamp(1, Timestamp.valueOf(latestModificationRange.get(0)));
