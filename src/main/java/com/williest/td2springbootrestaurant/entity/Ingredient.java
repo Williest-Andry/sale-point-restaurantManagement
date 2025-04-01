@@ -1,6 +1,8 @@
 package com.williest.td2springbootrestaurant.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Ingredient {
@@ -11,6 +13,8 @@ public class Ingredient {
     private Unit unit;
     private Double storageTotalIngredient = 0.0;
     private Double usedTotalIngredient = 0.0;
+    private List<Price> prices = new ArrayList<>();
+    private List<Stock> stocks = new ArrayList<Stock>();
 
     public Ingredient(String name, LocalDateTime latestModification, Double unitPrice, Unit unit) {
         this.name = name;
