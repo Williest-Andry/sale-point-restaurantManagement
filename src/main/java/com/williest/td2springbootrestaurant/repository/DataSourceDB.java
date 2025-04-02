@@ -7,12 +7,12 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 @Configuration
-public class CustomDataSource {
+public class DataSourceDB {
     private final String url = System.getenv("DB_URL");
     private final String user = System.getenv("DB_USERNAME");
     private final String password = System.getenv("DB_PASSWORD");
 
-    public CustomDataSource() {}
+    public DataSourceDB() {}
 
     public Connection getConnection() {
         try{

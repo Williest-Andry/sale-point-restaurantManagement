@@ -1,6 +1,5 @@
 package com.williest.td2springbootrestaurant.restController;
 
-import com.williest.td2springbootrestaurant.repository.CustomDataSource;
 import com.williest.td2springbootrestaurant.repository.IngredientDAO;
 import com.williest.td2springbootrestaurant.entity.Ingredient;
 import com.williest.td2springbootrestaurant.service.IngredientService;

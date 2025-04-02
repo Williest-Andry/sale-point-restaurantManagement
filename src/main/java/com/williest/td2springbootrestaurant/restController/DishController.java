@@ -1,6 +1,6 @@
 package com.williest.td2springbootrestaurant.restController;
 
-import com.williest.td2springbootrestaurant.repository.CustomDataSource;
+import com.williest.td2springbootrestaurant.repository.DataSourceDB;
 import com.williest.td2springbootrestaurant.repository.DishDAO;
 import com.williest.td2springbootrestaurant.entity.Dish;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 public class DishController {
-    DishDAO dishDAO = new DishDAO(new CustomDataSource());
+    DishDAO dishDAO = new DishDAO(new DataSourceDB());
 
     @GetMapping("/dishes")
     public List<Dish> getAllDishes(){

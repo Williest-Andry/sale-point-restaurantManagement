@@ -11,18 +11,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DishDAO implements EntityDAO<Dish> {
-    private CustomDataSource customDataSource;
+    private DataSourceDB dataSourceDB;
+    private  PriceDAO priceDAO;
+    private  StockDAO stockDAO;
 
-    public DishDAO(CustomDataSource customDataSource) {
-        this.customDataSource = customDataSource;
+    public DishDAO(DataSourceDB dataSourceDB) {
+        this.dataSourceDB = dataSourceDB;
     }
 
     @Override
     public Dish findById(long id , LocalDateTime chosenDate, LocalDateTime moveDate) {
         Dish dish = null;
-        IngredientDAO ingredientDAO = new IngredientDAO(customDataSource);
+        IngredientDAO ingredientDAO = new IngredientDAO(dataSourceDB, priceDAO, stockDAO);
 
-        try (Connection dbConnection = customDataSource.getConnection()){
+        try (Connection dbConnection = dataSourceDB.getConnection()){
             String sqlRequest = "SELECT dish_id, dish.name as dish_name, dish.unit_price as dish_unit_price, ingredient_id, " +
                     "ingredient.name, ingredient_quantity FROM dish_ingredient " +
                     "INNER JOIN dish ON dish.id = dish_id INNER JOIN ingredient ON ingredient.id = ingredient_id " +
@@ -38,7 +40,7 @@ public class DishDAO implements EntityDAO<Dish> {
                     );
                     dish.setId(rs.getInt("dish_id"));
                 }
-                Ingredient ingredient = ingredientDAO.findById(rs.getInt("ingredient_id"), chosenDate, moveDate);
+                Ingredient ingredient = ingredientDAO.findById(rs.getInt("ingredient_id"));
                 dish.addToIngredients(ingredient);
                 dish.addQuantity(ingredient, rs.getDouble("ingredient_quantity"));
             }
@@ -53,9 +55,9 @@ public class DishDAO implements EntityDAO<Dish> {
     public List<Dish> findAll(int page, int size) {
         List<Dish> dishes = new ArrayList<>();
         Dish dish = null;
-        IngredientDAO ingredientDAO = new IngredientDAO(customDataSource);
+        IngredientDAO ingredientDAO = new IngredientDAO(dataSourceDB, priceDAO, stockDAO);
 
-        try (Connection dbConnection = customDataSource.getConnection()){
+        try (Connection dbConnection = dataSourceDB.getConnection()){
             String sqlRequest = "SELECT dish_id, dish.name as dish_name, dish.unit_price as dish_unit_price, ingredient_id, " +
                     "ingredient.name, ingredient_quantity FROM dish_ingredient " +
                     "INNER JOIN dish ON dish.id = dish_id INNER JOIN ingredient ON ingredient.id = ingredient_id ";
@@ -69,7 +71,7 @@ public class DishDAO implements EntityDAO<Dish> {
                     );
                     dish.setId(rs.getInt("dish_id"));
                 }
-                Ingredient ingredient = ingredientDAO.findById(rs.getInt("ingredient_id"), null, null);
+                Ingredient ingredient = ingredientDAO.findById(rs.getInt("ingredient_id"));
                 dish.addToIngredients(ingredient);
                 dish.addQuantity(ingredient, rs.getDouble("ingredient_quantity"));
                 if(!dishes.contains(dish)){
