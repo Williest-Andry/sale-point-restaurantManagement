@@ -1,5 +1,6 @@
 package com.williest.td2springbootrestaurant.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,6 +8,7 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Getter
@@ -27,12 +29,14 @@ public class Ingredient {
         this.unit = unit;
     }
 
-    public Double getAvalaibleQuantity() {
-       throw new UnsupportedOperationException("not implemented");
-    }
+//    public Double getAvalaibleQuantity() {
+//       throw new UnsupportedOperationException("not implemented");
+//    }
 
     public Double getActualPrice() {
-        throw new UnsupportedOperationException("not implemented");
+//        return prices.stream().max(Comparator.comparing(Price::getBeginDate)).get().getAmount();
+        return 0.0;
     }
+
 }
 

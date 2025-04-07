@@ -16,18 +16,17 @@ import java.util.List;
 public class StockDAO {
     private final DataSourceDB dataSourceDB;
     private String sqlRequest;
-    private IngredientDAO ingredientDAO;
+    private IngredientDAO ingredientDAO ;
 
-    public StockDAO(DataSourceDB dataSourceDB, IngredientDAO ingredientDAO) {
+    public StockDAO(DataSourceDB dataSourceDB) {
         this.dataSourceDB = dataSourceDB;
-        this.ingredientDAO = ingredientDAO;
     }
 
     public List<Stock> findAllByIngredientId(long ingredientId){
         List<Stock> stocks = new ArrayList<>();
         Stock stock = null;
         try(Connection dbConnection = dataSourceDB.getConnection()){
-            sqlRequest = "SELECT id, type, ingredient_quantity, move_date FROM ingredient_move " +
+            sqlRequest = "SELECT ingredient_move.id, type, ingredient_quantity, move_date FROM ingredient_move " +
                     "INNER JOIN ingredient ON ingredient.id = ingredient_move.ingredient_id " +
                     "WHERE ingredient_move.ingredient_id = ?";
             PreparedStatement select = dbConnection.prepareStatement(sqlRequest);
@@ -36,7 +35,7 @@ public class StockDAO {
             Ingredient ingredient = ingredientDAO.findById(ingredientId);
             while(rs.next()){
                 stock = new Stock(
-                        rs.getLong("id"),
+                        rs.getLong("ingredient_move.id"),
                         ingredient,
                         MoveType.valueOf(rs.getString("type")),
                         rs.getTimestamp("move_date").toLocalDateTime()
@@ -45,7 +44,7 @@ public class StockDAO {
             }
         }
         catch(SQLException e){
-            throw new RuntimeException("CAN'T FIND ALL PRICES OF THE INGREDIENT : ",e);
+            e.printStackTrace();
         }
         return stocks;
     }

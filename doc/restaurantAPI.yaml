@@ -1,0 +1,52 @@
+openapi: 3.0.3
+info:
+  title: Restaurant management API
+  description: Restaurant management API
+  version: 1.0.0
+servers:
+  - url: 'https://localhost:8080'
+paths:
+  /ingredients:
+    get:
+      tags:
+        - Ingredient
+      description: Get all ingredients.
+      parameters:
+        - name: minPriceFilter
+          in: query
+          description: Minimun price
+          required: false
+          schema:
+            type: number
+        - name: maxPriceFilter
+          in: query
+          description: Maximum price
+          required: false
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Returns all ingredients.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ingredient'
+components:
+  schemas:
+    Ingredient:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        latestModification:
+          type: string
+          format: date
+        unit:
+          type: string
+        Prices:
+          type: array
+        Stocks:
+          type: array

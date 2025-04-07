@@ -1,7 +1,6 @@
 package com.williest.td2springbootrestaurant.repository;
 
-import com.williest.td2springbootrestaurant.entity.Ingredient;
-import com.williest.td2springbootrestaurant.entity.Unit;
+import com.williest.td2springbootrestaurant.entity.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -11,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Repository
 @AllArgsConstructor
+@Repository
 public class IngredientDAO {
     private final DataSourceDB dataSourceDB;
     private final PriceDAO priceDAO;
@@ -20,7 +19,7 @@ public class IngredientDAO {
 
     public Ingredient findById(long id) {
         Ingredient ingredient = null;
-        String sqlRequest = "SELECT id, name, latest_modification, unit FROM ingredient WHERE id = ?; ";
+        String sqlRequest = "SELECT ingredient.id, name, latest_modification, unit FROM ingredient WHERE id = ?; ";
         try (Connection dbConnection = dataSourceDB.getConnection();
              PreparedStatement selectIngredient = dbConnection.prepareStatement(sqlRequest);) {
             selectIngredient.setLong(1, id);
@@ -39,7 +38,7 @@ public class IngredientDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("ERROR IN FIND INGREDIENT BY ID : " + e);
+            e.printStackTrace();
         }
         return ingredient;
     }
@@ -61,6 +60,7 @@ public class IngredientDAO {
                 ingredient.setId(ingredientId);
                 ingredient.setPrices(priceDAO.findAllByIngredientId(ingredientId));
                 ingredient.setStocks(stockDAO.findAllByIngredientId(ingredientId));
+                ingredients.add(ingredient);
             }
         } catch (SQLException e) {
             throw new RuntimeException("ERROR IN FIND INGREDIENT BY ID : " + e);

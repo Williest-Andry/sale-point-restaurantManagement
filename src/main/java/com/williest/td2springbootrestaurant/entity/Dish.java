@@ -14,21 +14,21 @@ public class Dish {
         this.unit_price = unit_price;
     }
 
-    public int getAvalaibleQuantity() {
-        List<Double> allQuantities = new ArrayList<>();
-        Collections.sort(ingredients, (ingredient1, ingredient2) -> Long.compare(ingredient1.getId(), ingredient2.getId()));
-        List<Double> necessaryQuantities = ingredientQuantities.entrySet()
-                .stream()
-                .sorted((i1, i2) -> Long.compare(i1.getKey().getId(), i2.getKey().getId()))
-                .map(ingredient -> ingredient.getValue())
-                .toList();
-
-        for (int i = 0; i < ingredients.size(); i++) {
-            allQuantities.add(ingredients.get(i).getAvalaibleQuantity() / necessaryQuantities.get(i));
-        }
-
-        return allQuantities.stream().min(Double::compare).orElse(0.0).intValue();
-    }
+//    public int getAvalaibleQuantity() {
+//        List<Double> allQuantities = new ArrayList<>();
+//        Collections.sort(ingredients, (ingredient1, ingredient2) -> Long.compare(ingredient1.getId(), ingredient2.getId()));
+//        List<Double> necessaryQuantities = ingredientQuantities.entrySet()
+//                .stream()
+//                .sorted((i1, i2) -> Long.compare(i1.getKey().getId(), i2.getKey().getId()))
+//                .map(ingredient -> ingredient.getValue())
+//                .toList();
+//
+//        for (int i = 0; i < ingredients.size(); i++) {
+//            allQuantities.add(ingredients.get(i).getAvalaibleQuantity() / necessaryQuantities.get(i));
+//        }
+//
+//        return allQuantities.stream().min(Double::compare).orElse(0.0).intValue();
+//    }
 
     public void addToIngredients(Ingredient ingredient){
         ingredients.add(ingredient);
@@ -41,7 +41,7 @@ public class Dish {
     public double getIngredientCost() {
         double totatCost = 0;
         for (Ingredient ingredient : ingredients) {
-            totatCost += ingredientQuantities.get(ingredient) * ingredient.getUnitPrice();
+            totatCost += ingredientQuantities.get(ingredient) * ingredient.getActualPrice();
         }
 
         return totatCost;

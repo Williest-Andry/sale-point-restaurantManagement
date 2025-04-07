@@ -1,4 +1,4 @@
-package com.williest.td2springbootrestaurant.repository;
+package com.williest.td2springbootrestaurant.entity;
 
 import java.util.Objects;
 

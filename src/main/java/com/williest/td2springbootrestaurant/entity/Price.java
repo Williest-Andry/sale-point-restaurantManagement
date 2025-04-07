@@ -12,6 +12,6 @@ import java.time.LocalDateTime;
 public class Price {
     private long id;
     private Ingredient ingredient;
-    private Double amount = 0.0;
+    private Double amount;
     private LocalDateTime beginDate;
 }
