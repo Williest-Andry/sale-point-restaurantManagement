@@ -1,7 +1,7 @@
 package com.williest.td2springbootrestaurant.repository;
 
-import com.williest.td2springbootrestaurant.entity.Dish;
-import com.williest.td2springbootrestaurant.entity.Ingredient;
+import com.williest.td2springbootrestaurant.model.Dish;
+import com.williest.td2springbootrestaurant.model.Ingredient;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +13,7 @@ import java.util.List;
 public class DishDAO implements EntityDAO<Dish> {
     private DataSourceDB dataSourceDB;
     private  PriceDAO priceDAO;
-    private  StockDAO stockDAO;
+    private StockMovementDAO stockMovementDAO;
 
     public DishDAO(DataSourceDB dataSourceDB) {
         this.dataSourceDB = dataSourceDB;
@@ -22,7 +22,7 @@ public class DishDAO implements EntityDAO<Dish> {
     @Override
     public Dish findById(long id , LocalDateTime chosenDate, LocalDateTime moveDate) {
         Dish dish = null;
-        IngredientDAO ingredientDAO = new IngredientDAO(dataSourceDB, priceDAO, stockDAO);
+        IngredientDAO ingredientDAO = new IngredientDAO(dataSourceDB);
 
         try (Connection dbConnection = dataSourceDB.getConnection()){
             String sqlRequest = "SELECT dish_id, dish.name as dish_name, dish.unit_price as dish_unit_price, ingredient_id, " +
@@ -55,7 +55,7 @@ public class DishDAO implements EntityDAO<Dish> {
     public List<Dish> findAll(int page, int size) {
         List<Dish> dishes = new ArrayList<>();
         Dish dish = null;
-        IngredientDAO ingredientDAO = new IngredientDAO(dataSourceDB, priceDAO, stockDAO);
+        IngredientDAO ingredientDAO = new IngredientDAO(dataSourceDB);
 
         try (Connection dbConnection = dataSourceDB.getConnection()){
             String sqlRequest = "SELECT dish_id, dish.name as dish_name, dish.unit_price as dish_unit_price, ingredient_id, " +

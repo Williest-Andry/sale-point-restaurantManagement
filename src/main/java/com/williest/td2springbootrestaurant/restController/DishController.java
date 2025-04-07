@@ -2,7 +2,7 @@ package com.williest.td2springbootrestaurant.restController;
 
 import com.williest.td2springbootrestaurant.repository.DataSourceDB;
 import com.williest.td2springbootrestaurant.repository.DishDAO;
-import com.williest.td2springbootrestaurant.entity.Dish;
+import com.williest.td2springbootrestaurant.model.Dish;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;

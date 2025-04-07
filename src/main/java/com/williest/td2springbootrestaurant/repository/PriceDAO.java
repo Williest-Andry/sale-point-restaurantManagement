@@ -1,7 +1,7 @@
 package com.williest.td2springbootrestaurant.repository;
 
-import com.williest.td2springbootrestaurant.entity.Ingredient;
-import com.williest.td2springbootrestaurant.entity.Price;
+import com.williest.td2springbootrestaurant.model.Ingredient;
+import com.williest.td2springbootrestaurant.model.Price;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 
@@ -19,12 +19,12 @@ public class PriceDAO {
     private String sqlRequest;
     private IngredientDAO ingredientDAO;
 
-    public PriceDAO(DataSourceDB dataSourceDB, @Lazy IngredientDAO ingredientDAO) {
+    public PriceDAO(DataSourceDB dataSourceDB, IngredientDAO ingredientDAO) {
         this.dataSourceDB = dataSourceDB;
         this.ingredientDAO = ingredientDAO;
     }
 
-    public List<Price> findAllByIngredientId(long ingredientId){
+    public List<Price> findAllByIngredientId(Long ingredientId){
         List<Price> prices = new ArrayList<>();
         Price price = null;
 

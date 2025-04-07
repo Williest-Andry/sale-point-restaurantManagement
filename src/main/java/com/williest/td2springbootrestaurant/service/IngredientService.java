@@ -1,33 +1,35 @@
 package com.williest.td2springbootrestaurant.service;
 
-import com.williest.td2springbootrestaurant.entity.Ingredient;
-import com.williest.td2springbootrestaurant.repository.DataSourceDB;
+import com.williest.td2springbootrestaurant.model.Ingredient;
 import com.williest.td2springbootrestaurant.repository.IngredientDAO;
 import com.williest.td2springbootrestaurant.repository.PriceDAO;
-import com.williest.td2springbootrestaurant.repository.StockDAO;
+import com.williest.td2springbootrestaurant.repository.StockMovementDAO;
+import com.williest.td2springbootrestaurant.service.exception.ClientException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class IngredientService {
     private final IngredientDAO ingredientDAO;
-
-    public IngredientService (IngredientDAO ingredientDAO){
-        this.ingredientDAO = ingredientDAO;
-    }
+    private final PriceDAO priceDAO;
+    private final StockMovementDAO stockMovementDAO;
 
     public List<Ingredient> getAllIngredients(Double priceMinFilter, Double priceMaxFilter) {
-        System.out.println("IngredientDAO injecté : " + ingredientDAO);
         if((priceMinFilter != null && priceMaxFilter != null) && (priceMinFilter < 0 || priceMaxFilter < 0)) {
-            throw new RuntimeException("priceMinFilter or priceMaxFilter can't be negative!");
+            throw new ClientException("priceMinFilter or priceMaxFilter can't be negative!");
         }
         else if((priceMinFilter != null && priceMaxFilter != null) && (priceMinFilter > priceMaxFilter)) {
-            throw new RuntimeException("priceMinFilter= "+priceMinFilter+" can't be greater than priceMaxFilter" +
+            throw new ClientException("priceMinFilter= "+priceMinFilter+" can't be greater than priceMaxFilter" +
                     ": "+priceMaxFilter);
         }
+
         return ingredientDAO.findAll(1,10).stream()
                 .filter(ingredient -> {
+                    ingredient.setPrices(priceDAO.findAllByIngredientId(ingredient.getId()));
+                    ingredient.setStocksMovement(stockMovementDAO.findAllByIngredientId(ingredient.getId()));
                     if(priceMinFilter == null && priceMaxFilter != null){
                         return ingredient.getActualPrice() <= priceMaxFilter;
                     }
