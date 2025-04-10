@@ -18,13 +18,14 @@ public class Ingredient {
     private Long id;
     private String name;
     private LocalDateTime latestModification = LocalDateTime.now();
-    private Double unitPrice = this.getActualPrice();
     private Unit unit;
     private List<Price> prices = new ArrayList<>();
     private List<StockMovement> stocksMovement = new ArrayList<>();
 
-    @JsonIgnore
     public Double getAvalaibleQuantity() {
+        if(stocksMovement.isEmpty() || prices.isEmpty()){
+            return 0.0;
+        }
         Double totalStockIn = stocksMovement.stream()
                 .filter(stockMovement -> stockMovement.getMovementType() == StockMovementType.IN)
                 .map(StockMovement::getQuantity)

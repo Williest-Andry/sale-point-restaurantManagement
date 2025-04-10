@@ -35,7 +35,9 @@ public class IngredientController {
     public ResponseEntity<Object> getIngredients(@RequestParam(required = false) Double priceMinFilter,
                                                  @RequestParam(required = false) Double priceMaxFilter) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(ingredientService.getAllIngredients(priceMinFilter, priceMaxFilter));
+            List<Ingredient> ingredients = ingredientService.getAllIngredients(priceMinFilter, priceMaxFilter);
+            List<IngredientRest> ingredientsRest = ingredients.stream().map(ingredientRestMapper::apply).toList();
+            return ResponseEntity.status(HttpStatus.OK).body(ingredientsRest);
         } catch (ClientException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (ServerException e) {
