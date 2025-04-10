@@ -2,6 +2,7 @@ package com.williest.td2springbootrestaurant.repository;
 
 import com.williest.td2springbootrestaurant.model.Dish;
 import com.williest.td2springbootrestaurant.model.Ingredient;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
@@ -13,40 +14,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class DishDAO implements EntityDAO<Dish> {
-    private DataSourceDB dataSourceDB;
-    private  PriceDAO priceDAO;
-    private StockMovementDAO stockMovementDAO;
+    private final DataSourceDB dataSourceDB;
     private String sqlRequest;
 
-    public DishDAO(DataSourceDB dataSourceDB) {
-        this.dataSourceDB = dataSourceDB;
-    }
-
     @Override
-    public Dish findById(long id , LocalDateTime chosenDate, LocalDateTime moveDate) {
+    public Dish findById(long id) {
         Dish dish = null;
-        IngredientDAO ingredientDAO = new IngredientDAO(dataSourceDB);
 
         try (Connection dbConnection = dataSourceDB.getConnection()){
-            String sqlRequest = "SELECT dish_id, dish.name as dish_name, dish.unit_price as dish_unit_price, ingredient_id, " +
-                    "ingredient.name, ingredient_quantity FROM dish_ingredient " +
-                    "INNER JOIN dish ON dish.id = dish_id INNER JOIN ingredient ON ingredient.id = ingredient_id " +
-                    "WHERE dish.id=?;";
+            String sqlRequest = "SELECT id, name, unit_price FROM dish WHERE id=?;";
             PreparedStatement selectDish = dbConnection.prepareStatement(sqlRequest);
             selectDish.setLong(1, id);
             ResultSet rs = selectDish.executeQuery();
-            while(rs.next()) {
-                if(dish == null){
-                    dish = new Dish(
-                            rs.getString("dish_name"),
-                            rs.getDouble("dish_unit_price")
-                    );
-                    dish.setId(rs.getInt("dish_id"));
-                }
-                Ingredient ingredient = ingredientDAO.findById(rs.getLong("ingredient_id"));
-                dish.addToIngredients(ingredient);
-                dish.addQuantity(ingredient, rs.getDouble("ingredient_quantity"));
+            if (rs.next()) {
+                dish = new Dish();
+                dish.setId(rs.getLong("id"));
+                dish.setName(rs.getString("name"));
+                dish.setUnitPrice(rs.getDouble("unit_price"));
+//                dish.setIngredients(dishIngredientDAO.findDishIngredientByDishId(id));
             }
         }
         catch(Exception e){
@@ -59,49 +46,77 @@ public class DishDAO implements EntityDAO<Dish> {
     public List<Dish> findAll(int page, int size) {
         List<Dish> dishes = new ArrayList<>();
         Dish dish = null;
-        IngredientDAO ingredientDAO = new IngredientDAO(dataSourceDB);
 
         try (Connection dbConnection = dataSourceDB.getConnection()){
-            String sqlRequest = "SELECT dish_id, dish.name as dish_name, dish.unit_price as dish_unit_price, ingredient_id, " +
-                    "ingredient.name, ingredient_quantity FROM dish_ingredient " +
-                    "INNER JOIN dish ON dish.id = dish_id INNER JOIN ingredient ON ingredient.id = ingredient_id ";
+            String sqlRequest = "SELECT id, name, unit_price FROM dish;";
             PreparedStatement selectDish = dbConnection.prepareStatement(sqlRequest);
             ResultSet rs = selectDish.executeQuery();
-            while(rs.next()) {
-                if(dish == null){
-                    dish = new Dish(
-                            rs.getString("dish_name"),
-                            rs.getDouble("dish_unit_price")
-                    );
-                    dish.setId(rs.getInt("dish_id"));
-                }
-                Ingredient ingredient = ingredientDAO.findById(rs.getLong("ingredient_id"));
-                dish.addToIngredients(ingredient);
-                dish.addQuantity(ingredient, rs.getDouble("ingredient_quantity"));
-                if(!dishes.contains(dish)){
-                    dishes.add(dish);
-                }
+            while (rs.next()) {
+                dish = new Dish();
+                dish.setId(rs.getLong("id"));
+                dish.setName(rs.getString("name"));
+                dish.setUnitPrice(rs.getDouble("unit_price"));
+//                dish.setIngredients(dishIngredientDAO.findDishIngredientByDishId(rs.getLong("id")));
+                dishes.add(dish);
             }
         }
         catch(Exception e){
-            throw new RuntimeException("ERROR IN FIND DISH BY ID: " + e);
+            throw new RuntimeException("ERROR IN FIND ALL DISHES: " + e);
         }
         return dishes;
     }
 
     @Override
-    public Dish save(Dish entity) {
-        return null;
+    public Dish save(Dish dish) {
+        if(this.findById(dish.getId()) != null){
+            this.update(dish);
+        }
+        else{
+            try(Connection dbconnection = dataSourceDB.getConnection()){
+                sqlRequest = "INSERT INTO dish(name, unit_price) VALUES(?,?);";
+                PreparedStatement create = dbconnection.prepareStatement(sqlRequest);
+                create.setString(1, dish.getName());
+                create.setDouble(2, dish.getUnitPrice());
+                create.executeUpdate();
+//                this.dishIngredientDAO.saveAll(dish.getIngredients());
+            }
+            catch(SQLException e){
+                throw new RuntimeException("CAN'T SAVE THE DISH: ", e);
+            }
+        }
+        return this.findById(dish.getId());
     }
 
     @Override
-    public Dish update(Dish entity) {
-        return null;
+    public List<Dish> saveAll(List<Dish> dishes) {
+        List<Dish> savedDishes = new ArrayList<>();
+        dishes.forEach(this::save);
+        for (Dish dish : dishes) {
+            savedDishes.add(this.findById(dish.getId()));
+        }
+        return savedDishes;
+    }
+
+    @Override
+    public Dish update(Dish dish) {
+        try(Connection dbconnection = dataSourceDB.getConnection()){
+            sqlRequest = "UPDATE dish SET name=?, unit_price=? WHERE id=?;";
+            PreparedStatement update = dbconnection.prepareStatement(sqlRequest);
+            update.setString(1, dish.getName());
+            update.setDouble(2, dish.getUnitPrice());
+            update.setLong(3, dish.getId());
+            update.executeUpdate();
+//            this.dishIngredientDAO.saveAll(dish.getIngredients());
+        }
+        catch(SQLException e){
+            throw new RuntimeException("CAN'T UPDATE THE DISH: ", e);
+        }
+        return this.findById(dish.getId());
     }
 
     @Override
     public Dish deleteById(String id) {
-        return null;
+        throw new UnsupportedOperationException("not implemented");
     }
 
     public List<Dish> findBestSales(LocalDateTime startDate, LocalDateTime endDate, int numberOfDishes){
