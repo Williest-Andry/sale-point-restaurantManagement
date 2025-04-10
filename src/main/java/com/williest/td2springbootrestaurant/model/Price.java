@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class Price {
-    private long id;
+    private Long id;
     private Ingredient ingredient;
     private Double amount;
     private LocalDateTime beginDate;

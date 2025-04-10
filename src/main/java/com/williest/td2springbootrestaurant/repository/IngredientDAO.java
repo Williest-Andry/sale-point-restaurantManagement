@@ -3,7 +3,7 @@ package com.williest.td2springbootrestaurant.repository;
 import com.williest.td2springbootrestaurant.model.*;
 import com.williest.td2springbootrestaurant.service.exception.NotFoundException;
 import com.williest.td2springbootrestaurant.service.exception.ServerException;
-import org.springframework.context.annotation.Lazy;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -11,33 +11,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class IngredientDAO {
     private final DataSourceDB dataSourceDB;
+    private String sqlRequest;
 
-    public IngredientDAO(DataSourceDB dataSourceDB) {
-        this.dataSourceDB = dataSourceDB;
-
-    }
-
-    public Ingredient findById(long id) {
+    public Ingredient findById(Long id) {
         Ingredient ingredient = null;
-        String sqlRequest = "SELECT ingredient.id, name, latest_modification, unit FROM ingredient WHERE id = ?; ";
-        try (Connection dbConnection = dataSourceDB.getConnection();
-             PreparedStatement selectIngredient = dbConnection.prepareStatement(sqlRequest);) {
+        String sqlRequest = "SELECT ingredient.id, name, latest_modification, unit FROM ingredient WHERE id = ?;";
+        try (Connection dbConnection = dataSourceDB.getConnection();) {
+            PreparedStatement selectIngredient = dbConnection.prepareStatement(sqlRequest);
             selectIngredient.setLong(1, id);
-            try (ResultSet rs = selectIngredient.executeQuery()) {
-                if (rs.next()) {
-                    ingredient = new Ingredient();
-                    ingredient.setId(rs.getLong("id"));
-                    ingredient.setName(rs.getString("name"));
-                    ingredient.setLatestModification(rs.getTimestamp("latest_modification").toLocalDateTime());
-                    ingredient.setUnit(Unit.valueOf(rs.getString("unit")));
-
-//                    ingredient.setStocksMovement(stockMovementDAO.findAllByIngredientId(id));
-                } else {
-                    throw new RuntimeException("Ingredient with id: " + id + " doesn't exist!");
-                }
+            ResultSet rs = selectIngredient.executeQuery();
+            if (rs.next()) {
+                ingredient = new Ingredient();
+                ingredient.setId(rs.getLong("id"));
+                ingredient.setName(rs.getString("name"));
+                ingredient.setLatestModification(rs.getTimestamp("latest_modification").toLocalDateTime());
+                ingredient.setUnit(Unit.valueOf(rs.getString("unit")));
             }
+//            else if(ingredient == null) {
+//                throw new RuntimeException("Ingredient with id: " + id + " doesn't exist!");
+//            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -70,16 +66,55 @@ public class IngredientDAO {
         return ingredients;
     }
 
-    public Ingredient save(Ingredient entity) {
-        throw new RuntimeException("not implemented");
+    public Ingredient save(Ingredient ingredient) {
+        Long ingredientId = 0L;
+        if(this.findById(ingredient.getId()) != null){
+            return this.update(ingredient);
+        }
+        else{
+            try(Connection dbConnection = dataSourceDB.getConnection()){
+                System.out.println("haha");
+                sqlRequest = "INSERT INTO ingredient(name, latest_modification, unit) VALUES (?, ?, ?) ;";
+                PreparedStatement insert = dbConnection.prepareStatement(sqlRequest, Statement.RETURN_GENERATED_KEYS);
+                insert.setString(1, ingredient.getName());
+                insert.setTimestamp(2, Timestamp.valueOf(ingredient.getLatestModification()));
+                insert.setString(3, ingredient.getUnit().toString());
+                insert.executeUpdate();
+                ResultSet rs = insert.getGeneratedKeys();
+                if(rs.next()){
+                    ingredientId = rs.getLong(1);
+                }
+//                ResultSet rs = insert.executeQuery();
+//                if(rs.next()){
+//                    ingredientId = rs.getLong("id");
+//                }
+            }
+            catch (SQLException e) {
+                System.out.println("eto ee");
+                e.printStackTrace();
+            }
+        }
+        return this.findById(1L);
     }
 
-    public Ingredient update(Ingredient entity) {
-        return null;
+    public Ingredient update(Ingredient ingredient) {
+        try(Connection dbConnection = dataSourceDB.getConnection()){
+            sqlRequest = "UPDATE ingredient SET name=?, latest_modification=?, unit=?::unit WHERE id=?";
+            PreparedStatement update = dbConnection.prepareStatement(sqlRequest);
+            update.setString(1, ingredient.getName());
+            update.setTimestamp(2, Timestamp.valueOf(ingredient.getLatestModification()));
+            update.setString(3, ingredient.getUnit().toString());
+            update.setLong(4, ingredient.getId());
+            update.executeUpdate();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return this.findById(ingredient.getId());
     }
 
     public Ingredient deleteById(String id) {
-        return null;
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
 //    public List<Ingredient> findByCriteria(List<Criteria> criterias, List<LocalDateTime> latestModificationRange,

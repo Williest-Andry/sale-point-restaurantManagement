@@ -1,6 +1,7 @@
 package com.williest.td2springbootrestaurant.service;
 
 import com.williest.td2springbootrestaurant.model.Ingredient;
+import com.williest.td2springbootrestaurant.model.Price;
 import com.williest.td2springbootrestaurant.repository.IngredientDAO;
 import com.williest.td2springbootrestaurant.repository.PriceDAO;
 import com.williest.td2springbootrestaurant.repository.StockMovementDAO;
@@ -52,5 +53,15 @@ public class IngredientService {
 
     public Ingredient create(Ingredient ingredient){
         return ingredientDAO.save(ingredient);
+    }
+
+    public Ingredient addPrices(Long ingredientId, List<Price> prices){
+        Ingredient ingredient = ingredientDAO.findById(ingredientId);
+        ingredient.addPrices(priceDAO.findAllByIngredientId(ingredientId));
+        ingredient.addPrices(prices);
+        Ingredient savedIngredient = ingredientDAO.save(ingredient);
+        List<Price> savedPrices = priceDAO.saveAll(ingredient.getPrices());
+        savedIngredient.addPrices(savedPrices);
+        return savedIngredient;
     }
 }

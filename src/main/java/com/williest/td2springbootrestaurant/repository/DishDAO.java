@@ -44,7 +44,7 @@ public class DishDAO implements EntityDAO<Dish> {
                     );
                     dish.setId(rs.getInt("dish_id"));
                 }
-                Ingredient ingredient = ingredientDAO.findById(rs.getInt("ingredient_id"));
+                Ingredient ingredient = ingredientDAO.findById(rs.getLong("ingredient_id"));
                 dish.addToIngredients(ingredient);
                 dish.addQuantity(ingredient, rs.getDouble("ingredient_quantity"));
             }
@@ -75,7 +75,7 @@ public class DishDAO implements EntityDAO<Dish> {
                     );
                     dish.setId(rs.getInt("dish_id"));
                 }
-                Ingredient ingredient = ingredientDAO.findById(rs.getInt("ingredient_id"));
+                Ingredient ingredient = ingredientDAO.findById(rs.getLong("ingredient_id"));
                 dish.addToIngredients(ingredient);
                 dish.addQuantity(ingredient, rs.getDouble("ingredient_quantity"));
                 if(!dishes.contains(dish)){

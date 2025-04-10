@@ -29,6 +29,6 @@ public class DishController {
     public List<Dish> getBestSales(@RequestParam LocalDateTime startDate, @RequestParam LocalDateTime endDate,
                                    @RequestParam int numberOfDishes){
         // WHERE order_status='FINISHED' AND range of date
-
+        return null;
     }
 }

@@ -1,6 +1,11 @@
 package com.williest.td2springbootrestaurant.restController;
 
+import com.williest.td2springbootrestaurant.model.Ingredient;
 import com.williest.td2springbootrestaurant.model.Price;
+import com.williest.td2springbootrestaurant.restController.mapper.IngredientRestMapper;
+import com.williest.td2springbootrestaurant.restController.mapper.PriceRestMapper;
+import com.williest.td2springbootrestaurant.restController.rest.CreateIngredientPrice;
+import com.williest.td2springbootrestaurant.restController.rest.IngredientRest;
 import com.williest.td2springbootrestaurant.service.IngredientService;
 import com.williest.td2springbootrestaurant.service.PriceService;
 import com.williest.td2springbootrestaurant.service.exception.ClientException;
@@ -18,6 +23,8 @@ import java.util.List;
 public class IngredientController {
     private final IngredientService ingredientService;
     private final PriceService priceService;
+    private final PriceRestMapper priceRestMapper;
+    private final IngredientRestMapper ingredientRestMapper;
 
     @GetMapping("/ingredients")
     public ResponseEntity<Object> getIngredients(@RequestParam(required = false) Double priceMinFilter,
@@ -50,9 +57,17 @@ public class IngredientController {
 //        return ResponseEntity.status(HttpStatus.OK).body(ingredientService.create(ingredient));
 //    }
 //
-    @PutMapping("/ingredient/{ingredientId}/prices")
-    public ResponseEntity<Object> updateIngredientPriceById(@RequestBody List<Price> prices){
-        return ResponseEntity.status(HttpStatus.CREATED).body(priceService.updateByIngredientId(prices));
+    @PutMapping("/ingredients/{ingredientId}/prices")
+    public ResponseEntity<Object> updateIngredientPriceById(@PathVariable Long ingredientId,
+                                                            @RequestBody List<CreateIngredientPrice> pricesToCreate){
+        try{
+            List<Price> prices = pricesToCreate.stream().map(priceRestMapper::toModel).toList();
+            Ingredient ingredient = ingredientService.addPrices(ingredientId, prices);
+            IngredientRest ingredientRest = ingredientRestMapper.apply(ingredient);
+            return ResponseEntity.status(HttpStatus.CREATED).body(ingredientRest);
+        } catch(Exception e){
+            return ResponseEntity.internalServerError().body(e);
+        }
     }
 //
 //    @PutMapping("/ingredient/{ingredientId}/stocks")

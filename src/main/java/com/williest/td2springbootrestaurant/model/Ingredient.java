@@ -14,11 +14,10 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Ingredient {
     private Long id;
     private String name;
-    private LocalDateTime latestModification;
+    private LocalDateTime latestModification = LocalDateTime.now();
     private Double unitPrice = this.getActualPrice();
     private Unit unit;
     private List<Price> prices = new ArrayList<>();
@@ -47,6 +46,16 @@ public class Ingredient {
             return 0.0;
         }
         return prices.stream().max(Comparator.comparing(Price::getBeginDate)).get().getAmount();
+    }
+
+    public List<Price> addPrices(List<Price> prices){
+        prices.forEach(price -> price.setIngredient(this));
+        if (getPrices() == null || getPrices().isEmpty()){
+            this.setPrices(prices);
+        } else {
+            getPrices().addAll(prices);
+        }
+        return getPrices();
     }
 }
 

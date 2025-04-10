@@ -7,7 +7,8 @@ import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @Getter
-public class CreateIngredientPrice {
+public class PriceRest {
+    private Long id;
     private Double amount;
     private LocalDateTime beginDate;
 }
