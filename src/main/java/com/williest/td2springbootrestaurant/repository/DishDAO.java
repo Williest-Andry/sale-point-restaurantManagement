@@ -2,18 +2,22 @@ package com.williest.td2springbootrestaurant.repository;
 
 import com.williest.td2springbootrestaurant.model.Dish;
 import com.williest.td2springbootrestaurant.model.Ingredient;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class DishDAO implements EntityDAO<Dish> {
     private DataSourceDB dataSourceDB;
     private  PriceDAO priceDAO;
     private StockMovementDAO stockMovementDAO;
+    private String sqlRequest;
 
     public DishDAO(DataSourceDB dataSourceDB) {
         this.dataSourceDB = dataSourceDB;
@@ -98,6 +102,18 @@ public class DishDAO implements EntityDAO<Dish> {
     @Override
     public Dish deleteById(String id) {
         return null;
+    }
+
+    public List<Dish> findBestSales(LocalDateTime startDate, LocalDateTime endDate, int numberOfDishes){
+        List<Dish> bestDishes = new ArrayList<>();
+        try(Connection dbConnection = dataSourceDB.getConnection()){
+            sqlRequest = "select name, count(order_status) as total_sales, (dish_quantity* dish.unit_price) AS total_amount from order_status " +
+                    "join dish_order on dish_order.id=order_status.order_id " +
+                    "join dish on dish.id=dish_order.dish_id group by name, dish.unit_price, dish_quantity order by total_sales desc limit ?;";
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+        return bestDishes;
     }
 }
 

@@ -1,6 +1,8 @@
 package com.williest.td2springbootrestaurant.restController;
 
+import com.williest.td2springbootrestaurant.model.Price;
 import com.williest.td2springbootrestaurant.service.IngredientService;
+import com.williest.td2springbootrestaurant.service.PriceService;
 import com.williest.td2springbootrestaurant.service.exception.ClientException;
 import com.williest.td2springbootrestaurant.service.exception.NotFoundException;
 import com.williest.td2springbootrestaurant.service.exception.ServerException;
@@ -9,10 +11,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 public class IngredientController {
     private final IngredientService ingredientService;
+    private final PriceService priceService;
 
     @GetMapping("/ingredients")
     public ResponseEntity<Object> getIngredients(@RequestParam(required = false) Double priceMinFilter,
@@ -45,10 +50,10 @@ public class IngredientController {
 //        return ResponseEntity.status(HttpStatus.OK).body(ingredientService.create(ingredient));
 //    }
 //
-//    @PutMapping("/ingredient/{ingredientId}/prices")
-//    public ResponseEntity<Object> updateIngredientPriceById(@RequestBody List<Price> prices){
-//        return ResponseEntity.status(HttpStatus.CREATED).body(priceService.updateByIngredientId(prices));
-//    }
+    @PutMapping("/ingredient/{ingredientId}/prices")
+    public ResponseEntity<Object> updateIngredientPriceById(@RequestBody List<Price> prices){
+        return ResponseEntity.status(HttpStatus.CREATED).body(priceService.updateByIngredientId(prices));
+    }
 //
 //    @PutMapping("/ingredient/{ingredientId}/stocks")
 //    public ResponseEntity<Object> updateIngredientStockById(@RequestBody List<Stock> stocks){
