@@ -1,7 +1,5 @@
 package com.williest.td2springbootrestaurant.model;
 
-
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

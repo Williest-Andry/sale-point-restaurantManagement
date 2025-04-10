@@ -4,14 +4,12 @@ import com.williest.td2springbootrestaurant.model.Ingredient;
 import com.williest.td2springbootrestaurant.model.StockMovementType;
 import com.williest.td2springbootrestaurant.model.StockMovement;
 import com.williest.td2springbootrestaurant.model.Unit;
+import com.williest.td2springbootrestaurant.restController.rest.StockMovementRest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,5 +51,64 @@ public class StockMovementDAO {
             e.printStackTrace();
         }
         return stockMovements;
+    }
+
+    public StockMovement findById(Long id){
+        StockMovement stockMovement = null;
+        try(Connection dbConnection = dataSourceDB.getConnection()){
+            sqlRequest = "SELECT id, ingredient_id, type, ingredient_quantity, unit, move_date FROM ingredient_move WHERE id=?;";
+            PreparedStatement select = dbConnection.prepareStatement(sqlRequest);
+            select.setLong(1, id);
+            ResultSet rs = select.executeQuery();
+            if(rs.next()){
+                stockMovement = new StockMovement();
+                stockMovement.setId(rs.getLong("id"));
+                stockMovement.setMovementType(StockMovementType.valueOf(rs.getString("type")));
+                stockMovement.setMoveDate(rs.getTimestamp("move_date").toLocalDateTime());
+                stockMovement.setQuantity(rs.getDouble("ingredient_quantity"));
+                stockMovement.setUnit(Unit.valueOf(rs.getString("unit")));
+                stockMovement.setMoveDate(rs.getTimestamp("move_date").toLocalDateTime());
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return stockMovement;
+    }
+
+    public StockMovement save(StockMovement stockMovement){
+        Long stockMovementId = 0L;
+        if(stockMovement.getId() != null){
+            return stockMovement;
+        }
+        try(Connection dbConnection = dataSourceDB.getConnection()){
+            sqlRequest = "INSERT INTO ingredient_move(ingredient_id, type, ingredient_quantity, unit, move_date) " +
+                    "VALUES(?,?::move_type,?,?::unit,?) RETURNING id;";
+            PreparedStatement insert = dbConnection.prepareStatement(sqlRequest);
+            insert.setLong(1, stockMovement.getIngredient().getId());
+            insert.setString(2, stockMovement.getMovementType().toString());
+            insert.setDouble(3, stockMovement.getQuantity());
+            insert.setString(4, stockMovement.getUnit().toString());
+            insert.setTimestamp(5, Timestamp.valueOf(stockMovement.getMoveDate()));
+            ResultSet rs = insert.executeQuery();
+            if(rs.next()){
+                stockMovementId = rs.getLong("id");
+            }
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+        return this.findById(stockMovementId);
+    }
+
+    public List<StockMovement> saveAll(List<StockMovement> stockMovements){
+        List<StockMovement> savedStocks = new ArrayList<>();
+        for(StockMovement stockMovement : stockMovements) {
+            StockMovement savedStock = this.save(stockMovement);
+            savedStocks.add(savedStock);
+        }
+        return savedStocks;
+    }
+
+    public StockMovement update(StockMovement stockMovement){
+        throw new UnsupportedOperationException("not implemeted");
     }
 }

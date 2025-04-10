@@ -2,6 +2,7 @@ package com.williest.td2springbootrestaurant.service;
 
 import com.williest.td2springbootrestaurant.model.Ingredient;
 import com.williest.td2springbootrestaurant.model.Price;
+import com.williest.td2springbootrestaurant.model.StockMovement;
 import com.williest.td2springbootrestaurant.repository.IngredientDAO;
 import com.williest.td2springbootrestaurant.repository.PriceDAO;
 import com.williest.td2springbootrestaurant.repository.StockMovementDAO;
@@ -51,17 +52,26 @@ public class IngredientService {
         return ingredientDAO.findById(id);
     }
 
-    public Ingredient create(Ingredient ingredient){
-        return ingredientDAO.save(ingredient);
+    public Ingredient save(Ingredient ingredient){
+        Ingredient savedIngredient = ingredientDAO.save(ingredient);
+        List<Price> savedPrices = priceDAO.saveAll(ingredient.getPrices());
+        List<Price> allPrices = priceDAO.findAllByIngredientId(ingredient.getId());
+        List<StockMovement> savedStockMovements= stockMovementDAO.saveAll(ingredient.getStocksMovement());
+        List<StockMovement> allStockMovements = stockMovementDAO.findAllByIngredientId(ingredient.getId());
+        savedIngredient.setPrices(allPrices);
+        savedIngredient.setStocksMovement(allStockMovements);
+        return savedIngredient;
     }
 
     public Ingredient addPrices(Long ingredientId, List<Price> prices){
         Ingredient ingredient = ingredientDAO.findById(ingredientId);
-        ingredient.addPrices(priceDAO.findAllByIngredientId(ingredientId));
         ingredient.addPrices(prices);
-        Ingredient savedIngredient = ingredientDAO.save(ingredient);
-        List<Price> savedPrices = priceDAO.saveAll(ingredient.getPrices());
-        savedIngredient.addPrices(savedPrices);
-        return savedIngredient;
+        return this.save(ingredient);
+    }
+
+    public Ingredient addStockMovements(Long ingredientId, List<StockMovement> stockMovements){
+        Ingredient ingredient = ingredientDAO.findById(ingredientId);
+        ingredient.addStockMovement(stockMovements);
+        return this.save(ingredient);
     }
 }

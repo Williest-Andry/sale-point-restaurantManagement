@@ -57,5 +57,15 @@ public class Ingredient {
         }
         return getPrices();
     }
+
+    public List<StockMovement> addStockMovement(List<StockMovement> stockMovements){
+        stockMovements.forEach(stock -> stock.setIngredient(this));
+        if(getStocksMovement() == null || getStocksMovement().isEmpty()){
+            this.setStocksMovement(stockMovements);
+        } else{
+            getStocksMovement().addAll(stockMovements);
+        }
+        return getStocksMovement();
+    }
 }
 

@@ -2,10 +2,14 @@ package com.williest.td2springbootrestaurant.restController;
 
 import com.williest.td2springbootrestaurant.model.Ingredient;
 import com.williest.td2springbootrestaurant.model.Price;
+import com.williest.td2springbootrestaurant.model.StockMovement;
 import com.williest.td2springbootrestaurant.restController.mapper.IngredientRestMapper;
 import com.williest.td2springbootrestaurant.restController.mapper.PriceRestMapper;
+import com.williest.td2springbootrestaurant.restController.mapper.StockMovementRestMapper;
 import com.williest.td2springbootrestaurant.restController.rest.CreateIngredientPrice;
+import com.williest.td2springbootrestaurant.restController.rest.CreateStockMovement;
 import com.williest.td2springbootrestaurant.restController.rest.IngredientRest;
+import com.williest.td2springbootrestaurant.restController.rest.StockMovementRest;
 import com.williest.td2springbootrestaurant.service.IngredientService;
 import com.williest.td2springbootrestaurant.service.PriceService;
 import com.williest.td2springbootrestaurant.service.exception.ClientException;
@@ -25,6 +29,7 @@ public class IngredientController {
     private final PriceService priceService;
     private final PriceRestMapper priceRestMapper;
     private final IngredientRestMapper ingredientRestMapper;
+    private final StockMovementRestMapper stockMovementRestMapper;
 
     @GetMapping("/ingredients")
     public ResponseEntity<Object> getIngredients(@RequestParam(required = false) Double priceMinFilter,
@@ -58,7 +63,7 @@ public class IngredientController {
 //    }
 //
     @PutMapping("/ingredients/{ingredientId}/prices")
-    public ResponseEntity<Object> updateIngredientPriceById(@PathVariable Long ingredientId,
+    public ResponseEntity<Object> updateIngredientPrices(@PathVariable Long ingredientId,
                                                             @RequestBody List<CreateIngredientPrice> pricesToCreate){
         try{
             List<Price> prices = pricesToCreate.stream().map(priceRestMapper::toModel).toList();
@@ -69,9 +74,17 @@ public class IngredientController {
             return ResponseEntity.internalServerError().body(e);
         }
     }
-//
-//    @PutMapping("/ingredient/{ingredientId}/stocks")
-//    public ResponseEntity<Object> updateIngredientStockById(@RequestBody List<Stock> stocks){
-//        return ResponseEntity.status(HttpStatus.CREATED).body(priceService.updateByIngredientId(stocks));
-//    }
+
+    @PutMapping("/ingredients/{ingredientId}/stockMovements")
+    public ResponseEntity<Object> updateIngredientStocks(@PathVariable Long ingredientId,
+                                                            @RequestBody List<CreateStockMovement> stocksToCreate){
+        try{
+            List<StockMovement> stockMovements = stocksToCreate.stream().map(stockMovementRestMapper::toModel).toList();
+            Ingredient ingredient = ingredientService.addStockMovements(ingredientId, stockMovements);
+            IngredientRest ingredientRest  = ingredientRestMapper.apply(ingredient);
+            return ResponseEntity.status(HttpStatus.CREATED).body(ingredientRest);
+        } catch(Exception e){
+            return ResponseEntity.internalServerError().body(e);
+        }
+    }
 }
