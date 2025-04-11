@@ -9,7 +9,6 @@ import com.williest.td2springbootrestaurant.restController.mapper.StockMovementR
 import com.williest.td2springbootrestaurant.restController.rest.CreateIngredientPrice;
 import com.williest.td2springbootrestaurant.restController.rest.CreateStockMovement;
 import com.williest.td2springbootrestaurant.restController.rest.IngredientRest;
-import com.williest.td2springbootrestaurant.restController.rest.StockMovementRest;
 import com.williest.td2springbootrestaurant.service.IngredientService;
 import com.williest.td2springbootrestaurant.service.PriceService;
 import com.williest.td2springbootrestaurant.service.exception.ClientException;

@@ -26,27 +26,157 @@ paths:
             type: number
       responses:
         '200':
-          description: Returns all ingredients.
+          description: List of all ingredients.
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Ingredient'
+
+  /ingredients/{ingredientId}/prices:
+    put:
+      summary: Add new prices to a specifc ingredient
+      parameters:
+        - in: path
+          name: ingredientId
+          description: Id of the ingredient to modify
+          required: true
+          schema:
+            type: int
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Price'
+        required: true
+      responses:
+        200:
+          description: The specific ingredient with updated price history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+  /ingredients/{id}/stockMovements:
+    put:
+      summary: Add new stock movements to a specifc ingredient
+      parameters:
+        - in: path
+          name: ingredientId
+          description: Id of the ingredient to modify
+          required: true
+          schema:
+            type: int
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockMovement'
+        required: true
+      responses:
+        200:
+          description: The specific ingredient with updated stockMovement history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+  /dishes:
+    get:
+      summary: Get dishes
+      responses:
+        200:
+          description: List of dishes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dish'
 components:
   schemas:
-    Ingredient:
+    Dish:
+      type: object
       properties:
         id:
-          type: integer
+          type: int
         name:
           type: string
-        latestModification:
+        availableQuantity:
+          type: int
+        actualPrice:
+          type: float
+        ingredients:
+          type: array
+          items:
+            $ref: '#/components/schemas/DishIngredient'
+    DishIngredient:
+      type: object
+      properties:
+        requiredQuantity:
+          type: float
+        unit:
+          $ref: '#/components/schemas/Unit'
+        ingredient:
+          $ref: '#/components/schemas/IngredientBasicProperty'
+    IngredientBasicProperty:
+      type: object
+      properties:
+        id:
+          type: int
+        name:
+          type: string
+    Ingredient:
+      type: object
+      properties:
+        prices:
+          type: array
+          items:
+            $ref: '#/components/schemas/Price'
+        stockMovements:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockMovement'
+        availableQuantity:
+          type: float
+        actualPrice:
+          type: float
+      allOf:
+        - $ref: '#/components/schemas/IngredientBasicProperty'
+    Price:
+      type: object
+      properties:
+        id:
+          type: int
+        price:
+          type: float
+        dateValue:
           type: string
           format: date
+    StockMovement:
+      type: object
+      properties:
+        id:
+          type: int
+        quantity:
+          type: float
         unit:
+          $ref: '#/components/schemas/Unit'
+        type:
+          $ref: '#/components/schemas/StockMovementType'
+        creationDatetime:
           type: string
-        Prices:
-          type: array
-        Stocks:
-          type: array
+          format: date-time
+    StockMovementType:
+      type: string
+      enum:
+        - IN
+        - OUT
+    Unit:
+      type: string
+      enum:
+        - G
+        - U

@@ -2,6 +2,7 @@ package com.williest.td2springbootrestaurant.restController.mapper;
 
 import com.williest.td2springbootrestaurant.model.DishIngredient;
 import com.williest.td2springbootrestaurant.repository.PriceDAO;
+import com.williest.td2springbootrestaurant.restController.rest.CreateIngredient;
 import com.williest.td2springbootrestaurant.restController.rest.DishIngredientRest;
 import org.springframework.stereotype.Component;
 
@@ -19,5 +20,9 @@ public class DishIngredientMapper implements Function<DishIngredient, DishIngred
                 dishIngredient.getName(),
                 dishIngredient.getRequiredQuantity()
         );
+    }
+
+    public DishIngredient toModel(CreateIngredient createIngredient){
+        throw new UnsupportedOperationException("not implemented");
     }
 }

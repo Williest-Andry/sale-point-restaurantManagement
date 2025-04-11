@@ -1,17 +1,20 @@
 package com.williest.td2springbootrestaurant.restController;
 
+import com.williest.td2springbootrestaurant.model.DishIngredient;
+import com.williest.td2springbootrestaurant.model.Ingredient;
 import com.williest.td2springbootrestaurant.repository.DataSourceDB;
 import com.williest.td2springbootrestaurant.repository.DishDAO;
 import com.williest.td2springbootrestaurant.model.Dish;
+import com.williest.td2springbootrestaurant.restController.mapper.DishIngredientMapper;
 import com.williest.td2springbootrestaurant.restController.mapper.DishRestMapper;
+import com.williest.td2springbootrestaurant.restController.mapper.IngredientRestMapper;
+import com.williest.td2springbootrestaurant.restController.rest.CreateIngredient;
 import com.williest.td2springbootrestaurant.restController.rest.DishRest;
 import com.williest.td2springbootrestaurant.service.DishService;
+import com.williest.td2springbootrestaurant.service.IngredientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +25,9 @@ public class DishController {
     private final DishDAO dishDAO;
     private final DishService dishService;
     private final DishRestMapper dishRestMapper;
+    private final IngredientRestMapper ingredientRestMapper;
+    private final IngredientService ingredientService;
+    private final DishIngredientMapper dishIngredientMapper;
 
     @GetMapping("/dishes")
     public ResponseEntity<Object> getAllDishes(){
@@ -35,9 +41,16 @@ public class DishController {
         }
     }
 
-    @GetMapping("/dishes/{id}")
-    public Dish getDishById(@PathVariable int id){
-        return null;
+    @GetMapping("/dishes/{dishId}/ingredients")
+    public Dish getDishById(@PathVariable Long dishId, @RequestBody List<CreateIngredient> ingredientsToCreate){
+        try{
+            List<Ingredient> ingredients = ingredientsToCreate.stream().map(ingredientRestMapper::toModel).toList();
+//            List<Ingredient> savedIngredients = ingredientService.saveAll(savedIngredients);
+//            List<DishIngredient> dishIngredients = savedIngredients.stream().map(ingredient -> ingredientRestMapper.toDishIngredient(ingredient, )).toList();
+        } catch(Exception e){
+
+        }
+        throw new UnsupportedOperationException("not implemented");
     }
 
     @GetMapping("/bestSales")

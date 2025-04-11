@@ -1,5 +1,6 @@
 package com.williest.td2springbootrestaurant.restController.mapper;
 
+import com.williest.td2springbootrestaurant.model.DishIngredient;
 import com.williest.td2springbootrestaurant.model.Ingredient;
 import com.williest.td2springbootrestaurant.restController.rest.CreateIngredient;
 import com.williest.td2springbootrestaurant.restController.rest.IngredientRest;
@@ -33,6 +34,16 @@ public class IngredientRestMapper implements Function<Ingredient, IngredientRest
     }
 
     public Ingredient toModel(CreateIngredient createIngredient){
-        return new Ingredient();
+        Ingredient ingredient = new Ingredient();
+        ingredient.setName(createIngredient.getName());
+        ingredient.setUnit(createIngredient.getUnit());
+        return ingredient;
+    }
+
+    public DishIngredient toDishIngredient(Ingredient ingredient, CreateIngredient createIngredient){
+        DishIngredient dishIngredient = new DishIngredient();
+        dishIngredient.setName(ingredient.getName());
+        dishIngredient.setRequiredQuantity(createIngredient.getRequiredQuantity());
+        return dishIngredient;
     }
 }
