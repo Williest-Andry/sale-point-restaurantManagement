@@ -33,7 +33,6 @@ public class DishController {
     public ResponseEntity<Object> getAllDishes(){
         try{
             List<Dish> dishes = dishService.getAllDishes();
-            System.out.println(dishes.getFirst().getIngredients());
             List<DishRest> dishesRest = dishes.stream().map(dishRestMapper::apply).toList();
             return ResponseEntity.ok().body(dishesRest);
         } catch(Exception e){
@@ -57,6 +56,6 @@ public class DishController {
     public List<Dish> getBestSales(@RequestParam LocalDateTime startDate, @RequestParam LocalDateTime endDate,
                                    @RequestParam int numberOfDishes){
         // WHERE order_status='FINISHED' AND range of date
-        return null;
+        throw new UnsupportedOperationException("not implemented");
     }
 }

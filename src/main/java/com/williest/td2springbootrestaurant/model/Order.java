@@ -79,8 +79,8 @@ public class Order {
         }
     }
 
-    public EntityStatus getActualStatus() {
-        return orderStatus.stream().max(Comparator.comparing(EntityStatus::getStatusDate))
+    public OrderStatus getActualStatus() {
+        return orderStatus.stream().max(Comparator.comparing(OrderStatus::getStatusDate))
                 .orElse(null);
     }
 }

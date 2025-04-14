@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public abstract class EntityStatus {
+public class EntityStatus {
     private Long id;
     private Status status;
     private LocalDateTime statusDate;

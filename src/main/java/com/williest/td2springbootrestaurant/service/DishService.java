@@ -25,7 +25,6 @@ public class DishService {
         dishes.forEach(dish -> {
             dish.setIngredients(dishIngredientDAO.findDishIngredientByDishId(dish.getId()));
         });
-        System.out.println(dishes.getFirst().getIngredients());
         return dishes;
     }
 

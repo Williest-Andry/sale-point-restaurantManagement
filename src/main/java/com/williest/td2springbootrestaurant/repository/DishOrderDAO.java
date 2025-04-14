@@ -69,7 +69,24 @@ public class DishOrderDAO implements MakingOrderDAO<DishOrder>{
     }
 
     public List<DishOrder> findAllByOrderId(Long id){
-        throw new UnsupportedOperationException("Not supported yet.");
+        List<DishOrder> dishOrders = new ArrayList<>();
+
+        try(Connection dbConnection = dataSource.getConnection()){
+            sqlRequest = "SELECT * FROM dish_order WHERE order_id = ?;";
+            PreparedStatement select = dbConnection.prepareStatement(sqlRequest);
+            select.setLong(1, id);
+            ResultSet rs = select.executeQuery();
+            while(rs.next()) {
+                DishOrder dishOrder = new DishOrder();
+                dishOrder.setId(rs.getLong("id"));
+                dishOrder.setDishQuantity(rs.getInt("dish_quantity"));
+                dishOrder.setDishOrderCreationDate(rs.getTimestamp("dish_creation_date").toLocalDateTime());
+                dishOrders.add(dishOrder);
+            }
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+        return dishOrders;
     }
 
     @Override

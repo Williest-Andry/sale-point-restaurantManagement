@@ -96,6 +96,25 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Dish'
+  /orders/{reference}:
+    get:
+      description: Get order by reference
+      tags:
+        - Order
+      parameters:
+        - in: path
+          name: reference
+          description: Reference of the order
+          required: true
+          schema:
+            type: int
+      responses:
+        200:
+          description: The specific order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
 components:
   schemas:
     Dish:
@@ -180,3 +199,8 @@ components:
       enum:
         - G
         - U
+    Order:
+      type: object
+      properties:
+        reference:
+          type: int

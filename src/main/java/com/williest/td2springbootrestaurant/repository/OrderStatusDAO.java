@@ -2,13 +2,14 @@ package com.williest.td2springbootrestaurant.repository;
 
 import com.williest.td2springbootrestaurant.model.OrderStatus;
 import com.williest.td2springbootrestaurant.model.Status;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Repository
 public class OrderStatusDAO {
     private DataSourceDB dataSourceDB;
     private String sqlRequest;

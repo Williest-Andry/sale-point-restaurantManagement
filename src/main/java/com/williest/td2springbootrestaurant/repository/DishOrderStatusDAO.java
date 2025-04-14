@@ -40,5 +40,9 @@ public class DishOrderStatusDAO {
         }
         return this.findById(dishOrderStatusId);
     }
+
+    public List<DishOrderStatus> saveAll(List<DishOrderStatus> dishOrderStatusList){
+        return dishOrderStatusList.stream().map(this::saveDishOrderStatus).toList();
+    }
 }
 

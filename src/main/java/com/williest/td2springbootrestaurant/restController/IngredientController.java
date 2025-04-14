@@ -48,21 +48,6 @@ public class IngredientController {
         }
     }
 
-//    @GetMapping("/ingredients/{id}")
-//    public ResponseEntity<Object> getIngredient(@PathVariable long id) {
-//        return ResponseEntity.status(HttpStatus.OK).body(ingredientService.getIngredientById(id));
-//    }
-//
-//    @PostMapping("/ingredients")
-//    public ResponseEntity<Object> addIngredient(@RequestBody Ingredient ingredient) {
-//        return ResponseEntity.status(HttpStatus.CREATED).body(ingredientService.create(ingredient));
-//    }
-//
-//    @PutMapping("/ingredients")
-//    public ResponseEntity<Object> updateIngredient(@RequestBody Ingredient ingredient) {
-//        return ResponseEntity.status(HttpStatus.OK).body(ingredientService.create(ingredient));
-//    }
-//
     @PutMapping("/ingredients/{ingredientId}/prices")
     public ResponseEntity<Object> updateIngredientPrices(@PathVariable Long ingredientId,
                                                             @RequestBody List<CreateIngredientPrice> pricesToCreate){
@@ -88,4 +73,20 @@ public class IngredientController {
             return ResponseEntity.internalServerError().body(e);
         }
     }
+
+    //    @GetMapping("/ingredients/{id}")
+//    public ResponseEntity<Object> getIngredient(@PathVariable long id) {
+//        return ResponseEntity.status(HttpStatus.OK).body(ingredientService.getIngredientById(id));
+//    }
+//
+//    @PostMapping("/ingredients")
+//    public ResponseEntity<Object> addIngredient(@RequestBody Ingredient ingredient) {
+//        return ResponseEntity.status(HttpStatus.CREATED).body(ingredientService.create(ingredient));
+//    }
+//
+//    @PutMapping("/ingredients")
+//    public ResponseEntity<Object> updateIngredient(@RequestBody Ingredient ingredient) {
+//        return ResponseEntity.status(HttpStatus.OK).body(ingredientService.create(ingredient));
+//    }
+//
 }
