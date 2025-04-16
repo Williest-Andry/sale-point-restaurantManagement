@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,9 +24,6 @@ public class OrderService {
     }
 
     public Order getOrderByReference(Long reference){
-        if(reference.getClass() != Long.class){
-            throw new RuntimeException("The reference must be a number!");
-        }
         Order order = orderDAO.findByReference(reference);
         order.setDishOrders(this.dishOrderDAO.findAllByOrderId(order.getId()));
         order.setOrderStatus(this.orderStatusDAO.findAllByOrderId(order.getId()));
@@ -47,16 +43,42 @@ public class OrderService {
 
     public Order updateOrderDishStatusById(Long reference, Long dishId, Status status){
         Order order = orderDAO.findByReference(reference);
+        order.setDishOrders(this.dishOrderDAO.findAllByOrderId(order.getId()));
         DishOrder dishOrderToModify = order.getDishOrders().stream().filter(dishOrder -> dishOrder.getDish().getId() == dishId).toList().getFirst();
         order.getDishOrders().remove(dishOrderToModify);
+
         DishOrderStatus dishOrderStatus = new DishOrderStatus();
         dishOrderStatus.setDishOrder(dishOrderToModify);
         dishOrderStatus.setStatusDate(LocalDateTime.now());
         dishOrderStatus.setStatus(status);
         dishOrderToModify.addAndUpdateStatus(dishOrderStatus);
         order.getDishOrders().add(dishOrderToModify);
+
         Order savedOrder = orderDAO.save(order);
-        savedOrder.getDishOrders().forEach(dishOrder -> this.dishOrderStatusDAO.saveAll(dishOrder.getDishOrderStatus()));
+        savedOrder.setDishOrders(this.dishOrderDAO.saveAll(order.getDishOrders()));
+        savedOrder.getDishOrders().forEach(dishOrder -> {
+            this.dishOrderStatusDAO.saveAll(dishOrder.getDishOrderStatus());
+            System.out.println(this.dishOrderStatusDAO.saveAll(dishOrder.getDishOrderStatus()).size());
+            System.out.println(dishOrder.getDishOrderStatus().size());
+        });
+        savedOrder.getDishOrders().forEach(dishOrder -> {
+            dishOrder.setDishOrderStatus(this.dishOrderStatusDAO.findAllByDishOrderId(dishOrder.getId()));
+        });
+        return savedOrder;
+    }
+
+    public Order updateDishOrders(Long reference, List<DishOrder> dishOrders){
+        Order order = orderDAO.findByReference(reference);
+        order.getDishOrders().clear();
+        dishOrders.forEach(dishOrder -> {
+            if(this.dishOrderDAO.findAllByOrderId(order.getId()) != null){
+
+            }
+        });
+        order.setDishOrders(dishOrders);
+        Order savedOrder = orderDAO.save(order);
+        savedOrder.setDishOrders(this.dishOrderDAO.saveAll(dishOrders));
+        System.out.println("eto");
         return savedOrder;
     }
 }

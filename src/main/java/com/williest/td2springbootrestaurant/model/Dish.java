@@ -30,4 +30,10 @@ public class Dish {
     public double getGrossMargin() {
         return unitPrice - this.getIngredientCost();
     }
+
+    public List<DishIngredient> addDishIngredient(List<DishIngredient> dishIngredients) {
+        dishIngredients.forEach(dishIngredient -> dishIngredient.setDish(this));
+        ingredients.addAll(dishIngredients);
+        return dishIngredients;
+    }
 }

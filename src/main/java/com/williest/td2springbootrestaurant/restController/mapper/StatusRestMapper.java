@@ -11,6 +11,10 @@ import java.util.function.Function;
 public class StatusRestMapper implements Function<CreateStatus, EntityStatus> {
     @Override
     public EntityStatus apply(CreateStatus createStatus) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public EntityStatus toModel(CreateStatus createStatus) {
         EntityStatus entityStatus = new EntityStatus();
         entityStatus.setStatus(createStatus.getStatus());
         entityStatus.setStatusDate(LocalDateTime.now());

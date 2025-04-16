@@ -12,11 +12,13 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class DishOrderRest {
+    private String name;
+    private Double unitPrice;
     private int dishQuantity;
     @JsonIgnore
     private List<DishOrderStatus> dishOrderStatus = new ArrayList<>();
 
-    public DishOrderStatus getActualStatus(){
+    public DishOrderStatus getActualStatus() {
         return dishOrderStatus.stream().max(Comparator.comparing(DishOrderStatus::getStatusDate))
                 .orElse(null);
     }

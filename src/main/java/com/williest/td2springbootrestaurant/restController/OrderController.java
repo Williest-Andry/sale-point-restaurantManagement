@@ -35,9 +35,11 @@ public class OrderController {
 
     @PutMapping("/orders/{reference}/dishes")
     public ResponseEntity<Object> updateOrderDishByReference(@PathVariable Long reference,
-                                                             @RequestBody List<CreateOrder> createOrder){
-//        List<Order> orders = createOrder.stream().map(orderRestMapper::apply).toList();
-        throw new UnsupportedOperationException("not implemented");
+                                                             @RequestBody CreateOrder createOrder){
+        Order order = orderRestMapper.toModel(createOrder);
+        OrderRest orderRest = orderRestMapper.apply(orderService.updateDishOrders(reference, order.getDishOrders()));
+        return ResponseEntity.ok().body(orderRest);
+//        throw new UnsupportedOperationException("not implemented");
     }
 
     @PutMapping("/orders/{reference}/dishes/{dishId}")
@@ -45,8 +47,7 @@ public class OrderController {
                                                                    @PathVariable Long dishId,
                                                                    @RequestBody CreateStatus createStatus){
 
-        Order order = orderService.updateOrderDishStatusById(reference, dishId, this.statusRestMapper.apply(createStatus).getStatus());
-        return ResponseEntity.ok().body(order);
-//        throw new UnsupportedOperationException("not implemented");
+        Order order = orderService.updateOrderDishStatusById(reference, dishId, this.statusRestMapper.toModel(createStatus).getStatus());
+        return ResponseEntity.ok().body(orderRestMapper.apply(order));
     }
 }

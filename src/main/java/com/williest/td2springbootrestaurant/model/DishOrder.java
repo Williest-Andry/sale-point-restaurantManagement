@@ -60,8 +60,10 @@ public class DishOrder{
     }
 
     public DishOrderStatus getActualStatus(){
+        DishOrderStatus defaultStatus = new DishOrderStatus();
+        defaultStatus.setStatus(Status.CREATED);
         return dishOrderStatus.stream().max(Comparator.comparing(DishOrderStatus::getStatusDate))
-                .orElse(null);
+                .orElse(defaultStatus);
     }
 }
 

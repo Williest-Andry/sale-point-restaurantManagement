@@ -40,16 +40,16 @@ public class DishController {
         }
     }
 
-    @GetMapping("/dishes/{dishId}/ingredients")
-    public Dish getDishById(@PathVariable Long dishId, @RequestBody List<CreateIngredient> ingredientsToCreate){
+    @PutMapping("/dishes/{dishId}/ingredients")
+    public ResponseEntity<Object> getDishById(@PathVariable Long dishId,
+                                              @RequestBody List<CreateIngredient> ingredientsToCreate){
         try{
-            List<Ingredient> ingredients = ingredientsToCreate.stream().map(ingredientRestMapper::toModel).toList();
-//            List<Ingredient> savedIngredients = ingredientService.saveAll(savedIngredients);
-//            List<DishIngredient> dishIngredients = savedIngredients.stream().map(ingredient -> ingredientRestMapper.toDishIngredient(ingredient, )).toList();
+            List<DishIngredient> ingredients = ingredientsToCreate.stream().map(dishIngredientMapper::toModel).toList();
+            Dish dish = dishService.updateDishIngredients(dishId, ingredients);
+            return ResponseEntity.ok().body(dishRestMapper.apply(dish));
         } catch(Exception e){
-
+            return ResponseEntity.internalServerError().body(e);
         }
-        throw new UnsupportedOperationException("not implemented");
     }
 
     @GetMapping("/bestSales")

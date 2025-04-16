@@ -23,6 +23,9 @@ public class DishIngredientMapper implements Function<DishIngredient, DishIngred
     }
 
     public DishIngredient toModel(CreateIngredient createIngredient){
-        throw new UnsupportedOperationException("not implemented");
+        DishIngredient dishIngredient = new DishIngredient();
+        dishIngredient.setName(createIngredient.getName());
+        dishIngredient.setRequiredQuantity(createIngredient.getRequiredQuantity());
+        return dishIngredient;
     }
 }

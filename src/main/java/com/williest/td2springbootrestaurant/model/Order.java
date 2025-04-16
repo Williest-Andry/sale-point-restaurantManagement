@@ -26,7 +26,10 @@ public class Order {
         if(this.getActualStatus().getStatus() != Status.CREATED) {
             throw new RuntimeException("CAN'T ADD DISH ORDER BECAUSE STATUS IS NOT CREATED");
         }
-        dishOrders.stream().filter(dishOrder -> dishOrder.getActualStatus().getStatus() != Status.CREATED).forEach(dishOrder -> this.dishOrders.add(dishOrder));
+        List<DishOrder> createdDishOrders = dishOrders.stream().filter(dishOrder -> dishOrder.getActualStatus().getStatus() == Status.CREATED).toList();
+        createdDishOrders.forEach(this.dishOrders::remove);
+        dishOrders.forEach(dishOrder -> dishOrder.setOrder(this));
+        this.dishOrders.addAll(dishOrders);
     }
 
     public void addDishOrder(DishOrder dishOrder) {
@@ -80,7 +83,9 @@ public class Order {
     }
 
     public OrderStatus getActualStatus() {
+        OrderStatus defaultStatus = new OrderStatus();
+        defaultStatus.setStatus(Status.CREATED);
         return orderStatus.stream().max(Comparator.comparing(OrderStatus::getStatusDate))
-                .orElse(null);
+                .orElse(defaultStatus);
     }
 }

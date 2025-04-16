@@ -2,6 +2,7 @@ package com.williest.td2springbootrestaurant.repository;
 
 import com.williest.td2springbootrestaurant.model.OrderStatus;
 import com.williest.td2springbootrestaurant.model.Status;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -10,10 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class OrderStatusDAO {
-    private DataSourceDB dataSourceDB;
+    private final DataSourceDB dataSourceDB;
     private String sqlRequest;
-    private OrderDAO orderDAO;
 
     public OrderStatus findById(Long id) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -32,8 +33,8 @@ public class OrderStatusDAO {
                 status.setId(rs.getLong("status_id"));
                 status.setStatus(Status.valueOf(rs.getString("order_status")));
                 status.setStatusDate(rs.getTimestamp("order_status_date").toLocalDateTime());
-                status.setOrder(this.orderDAO.findById(id));
                 orderStatus.add(status);
+                System.out.println(status);
             }
         }
         catch(SQLException e){

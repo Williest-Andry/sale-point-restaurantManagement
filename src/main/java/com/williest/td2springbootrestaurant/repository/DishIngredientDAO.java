@@ -95,7 +95,7 @@ public class DishIngredientDAO implements EntityDAO<DishIngredient> {
 
     @Override
     public DishIngredient save(DishIngredient dishIngredient) {
-        if(this.findById(dishIngredient.getId()) != null){
+        if(dishIngredient.getId() != null){
             this.update(dishIngredient);
         }
         else{
@@ -117,12 +117,7 @@ public class DishIngredientDAO implements EntityDAO<DishIngredient> {
 
     @Override
     public List<DishIngredient> saveAll(List<DishIngredient> dishIngredients) {
-        List<DishIngredient> savedDishIngredients = new ArrayList<>();
-        dishIngredients.forEach(this::save);
-        for (DishIngredient dishIngredient : dishIngredients) {
-            savedDishIngredients.add(this.findById(dishIngredient.getId()));
-        }
-        return savedDishIngredients;
+        return dishIngredients.stream().map(this::save).toList();
     }
 
     @Override
