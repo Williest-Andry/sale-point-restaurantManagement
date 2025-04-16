@@ -44,6 +44,7 @@ public class DishOrderStatusDAO {
     public DishOrderStatus saveDishOrderStatus(DishOrderStatus dishOrderStatus){
         Long dishOrderStatusId = 0L;
         try (Connection dbConnection = dataSource.getConnection()){
+            System.out.println("mandalo?");
             sqlRequest = "INSERT INTO dish_order_status (dish_order_id, dish_order_status, dish_order_status_date) " +
                     "VALUES (?,?::status,?) RETURNING id;";
             PreparedStatement insert = dbConnection.prepareStatement(sqlRequest);

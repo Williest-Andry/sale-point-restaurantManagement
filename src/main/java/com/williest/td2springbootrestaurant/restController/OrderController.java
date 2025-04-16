@@ -1,7 +1,6 @@
 package com.williest.td2springbootrestaurant.restController;
 
 import com.williest.td2springbootrestaurant.model.Order;
-import com.williest.td2springbootrestaurant.model.Status;
 import com.williest.td2springbootrestaurant.restController.mapper.OrderRestMapper;
 import com.williest.td2springbootrestaurant.restController.mapper.StatusRestMapper;
 import com.williest.td2springbootrestaurant.restController.rest.CreateOrder;
@@ -12,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,7 +25,6 @@ public class OrderController {
             OrderRest orderRest = orderRestMapper.apply(orderService.getOrderByReference(reference));
             return ResponseEntity.ok().body(orderRest);
         } catch(Exception e){
-            System.out.println(e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
         }
     }
@@ -39,7 +35,6 @@ public class OrderController {
         Order order = orderRestMapper.toModel(createOrder);
         OrderRest orderRest = orderRestMapper.apply(orderService.updateDishOrders(reference, order.getDishOrders()));
         return ResponseEntity.ok().body(orderRest);
-//        throw new UnsupportedOperationException("not implemented");
     }
 
     @PutMapping("/orders/{reference}/dishes/{dishId}")

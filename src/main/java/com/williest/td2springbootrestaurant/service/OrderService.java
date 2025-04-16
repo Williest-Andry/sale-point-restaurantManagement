@@ -26,6 +26,9 @@ public class OrderService {
     public Order getOrderByReference(Long reference){
         Order order = orderDAO.findByReference(reference);
         order.setDishOrders(this.dishOrderDAO.findAllByOrderId(order.getId()));
+        order.getDishOrders().forEach(dishOrder -> {
+            dishOrder.setDishOrderStatus(this.dishOrderStatusDAO.findAllByDishOrderId(dishOrder.getId()));
+        });
         order.setOrderStatus(this.orderStatusDAO.findAllByOrderId(order.getId()));
         return order;
     }
@@ -53,13 +56,14 @@ public class OrderService {
         dishOrderStatus.setStatus(status);
         dishOrderToModify.addAndUpdateStatus(dishOrderStatus);
         order.getDishOrders().add(dishOrderToModify);
+        System.out.println(order.getDishOrders().size());
+            System.out.println(order.getDishOrders().getFirst().getDishOrderStatus().size());
 
         Order savedOrder = orderDAO.save(order);
         savedOrder.setDishOrders(this.dishOrderDAO.saveAll(order.getDishOrders()));
         savedOrder.getDishOrders().forEach(dishOrder -> {
             this.dishOrderStatusDAO.saveAll(dishOrder.getDishOrderStatus());
             System.out.println(this.dishOrderStatusDAO.saveAll(dishOrder.getDishOrderStatus()).size());
-            System.out.println(dishOrder.getDishOrderStatus().size());
         });
         savedOrder.getDishOrders().forEach(dishOrder -> {
             dishOrder.setDishOrderStatus(this.dishOrderStatusDAO.findAllByDishOrderId(dishOrder.getId()));
