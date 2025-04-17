@@ -66,6 +66,30 @@ public class IngredientDAO {
         return ingredients;
     }
 
+    public Ingredient findByName(String ingredientName) {
+        Ingredient ingredient = null;
+        String sqlRequest = "SELECT ingredient.id, name, latest_modification, unit FROM ingredient WHERE name = ?;";
+        try (Connection dbConnection = dataSourceDB.getConnection();) {
+            PreparedStatement selectIngredient = dbConnection.prepareStatement(sqlRequest);
+            selectIngredient.setString(1, ingredientName);
+            ResultSet rs = selectIngredient.executeQuery();
+            if (rs.next()) {
+                ingredient = new Ingredient();
+                ingredient.setId(rs.getLong("id"));
+                ingredient.setName(rs.getString("name"));
+                ingredient.setLatestModification(rs.getTimestamp("latest_modification").toLocalDateTime());
+                ingredient.setUnit(Unit.valueOf(rs.getString("unit")));
+            }
+//            else if(ingredient == null) {
+//                throw new RuntimeException("Ingredient with id: " + id + " doesn't exist!");
+//            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ingredient;
+    }
+
     public Ingredient save(Ingredient ingredient) {
         Long ingredientId = 0L;
         if(this.findById(ingredient.getId()) != null){

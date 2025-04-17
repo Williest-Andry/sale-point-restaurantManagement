@@ -1,10 +1,7 @@
 package com.williest.td2springbootrestaurant.service;
 
 import com.williest.td2springbootrestaurant.model.*;
-import com.williest.td2springbootrestaurant.repository.DishOrderDAO;
-import com.williest.td2springbootrestaurant.repository.DishOrderStatusDAO;
-import com.williest.td2springbootrestaurant.repository.OrderDAO;
-import com.williest.td2springbootrestaurant.repository.OrderStatusDAO;
+import com.williest.td2springbootrestaurant.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +15,7 @@ public class OrderService {
     private final OrderStatusDAO orderStatusDAO;
     private final DishOrderDAO dishOrderDAO;
     private final DishOrderStatusDAO dishOrderStatusDAO;
+    private final DishDAO dishDAO;
 
     public List<Order> getAllOrders(){
         return orderDAO.findAll();
@@ -75,14 +73,16 @@ public class OrderService {
         Order order = orderDAO.findByReference(reference);
         order.getDishOrders().clear();
         dishOrders.forEach(dishOrder -> {
-            if(this.dishOrderDAO.findAllByOrderId(order.getId()) != null){
-
+            if(this.dishDAO.findByName(dishOrder.getDish().getName()) == null){
+                throw new RuntimeException(dishOrder.getDish().getName()+" not exists");
             }
-        });
-        order.setDishOrders(dishOrders);
-        Order savedOrder = orderDAO.save(order);
-        savedOrder.setDishOrders(this.dishOrderDAO.saveAll(dishOrders));
+            dishOrder.setDish(this.dishDAO.findByName(dishOrder.getDish().getName()));
+            order.addDishOrder(dishOrder);
         System.out.println("eto");
+            this.dishOrderDAO.save(dishOrder);
+        });
+        Order savedOrder = orderDAO.save(order);
+        savedOrder.setDishOrders(this.dishOrderDAO.findAllByOrderId(savedOrder.getId()));
         return savedOrder;
     }
 }

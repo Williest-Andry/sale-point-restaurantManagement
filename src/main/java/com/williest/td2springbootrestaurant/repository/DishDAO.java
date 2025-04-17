@@ -66,6 +66,28 @@ public class DishDAO implements EntityDAO<Dish> {
         return dishes;
     }
 
+    public Dish findByName(String dishName) {
+        Dish dish = null;
+
+        try (Connection dbConnection = dataSourceDB.getConnection()){
+            String sqlRequest = "SELECT id, name, unit_price FROM dish WHERE name=?;";
+            PreparedStatement selectDish = dbConnection.prepareStatement(sqlRequest);
+            selectDish.setString(1, dishName);
+            ResultSet rs = selectDish.executeQuery();
+            if (rs.next()) {
+                dish = new Dish();
+                dish.setId(rs.getLong("id"));
+                dish.setName(rs.getString("name"));
+                dish.setUnitPrice(rs.getDouble("unit_price"));
+//                dish.setIngredients(dishIngredientDAO.findDishIngredientByDishId(id));
+            }
+        }
+        catch(Exception e){
+            throw new RuntimeException("ERROR IN FIND DISH BY NAME: " + e);
+        }
+        return dish;
+    }
+
     @Override
     public Dish save(Dish dish) {
         if(this.findById(dish.getId()) != null){

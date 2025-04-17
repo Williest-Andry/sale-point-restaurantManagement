@@ -3,6 +3,7 @@ package com.williest.td2springbootrestaurant.restController.rest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.williest.td2springbootrestaurant.model.Price;
 import com.williest.td2springbootrestaurant.model.StockMovement;
+import com.williest.td2springbootrestaurant.model.StockMovementType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Getter
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class DishIngredientRest {
     private final Long id;
     private final String name;
@@ -29,7 +30,26 @@ public class DishIngredientRest {
         return prices.stream().max(Comparator.comparing(Price::getBeginDate)).get().getAmount();
     }
 
-//    public StockMovement getActualStockMovement() {
-//
-//    }
+    public StockMovement getActualStockMovement() {
+        return stocksMovement.stream().max(Comparator.comparing(StockMovement::getMoveDate)).get();
+    }
+
+    public Double getAvalaibleQuantity() {
+        if(stocksMovement.isEmpty()){
+            return 0.0;
+        }
+        Double totalStockIn = stocksMovement.stream()
+                .filter(stockMovement -> stockMovement.getMovementType() == StockMovementType.IN)
+                .map(StockMovement::getQuantity)
+                .reduce(Double::sum)
+                .orElse(0.0);
+
+        Double totalStockOut = stocksMovement.stream()
+                .filter(stockMovement -> stockMovement.getMovementType() == StockMovementType.OUT)
+                .map(StockMovement::getQuantity)
+                .reduce(Double::sum)
+                .orElse(0.0);
+
+        return totalStockIn - totalStockOut;
+    }
 }

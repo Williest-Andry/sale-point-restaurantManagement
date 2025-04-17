@@ -14,11 +14,12 @@ public class DishIngredientMapper implements Function<DishIngredient, DishIngred
 
     @Override
     public DishIngredientRest apply(DishIngredient dishIngredient) {
-
         return new DishIngredientRest(
                 dishIngredient.getId(),
                 dishIngredient.getName(),
-                dishIngredient.getRequiredQuantity()
+                dishIngredient.getRequiredQuantity(),
+                dishIngredient.getIngredient().getPrices(),
+                dishIngredient.getIngredient().getStocksMovement()
         );
     }
 

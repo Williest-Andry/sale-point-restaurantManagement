@@ -19,7 +19,7 @@ public class Ingredient {
     private List<StockMovement> stocksMovement = new ArrayList<>();
 
     public Double getAvalaibleQuantity() {
-        if(stocksMovement.isEmpty() || prices.isEmpty()){
+        if(stocksMovement.isEmpty()){
             return 0.0;
         }
         Double totalStockIn = stocksMovement.stream()

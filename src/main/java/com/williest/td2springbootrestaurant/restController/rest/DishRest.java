@@ -15,15 +15,13 @@ public class DishRest {
     private Long id;
     private String name;
     private Double unitPrice;
-    private List<DishIngredientRest> ingredientsRest = new ArrayList<>();
-//    @JsonIgnore
-//    private List<DishIngredient> ingredients = new ArrayList<>();
-//
-//    public int getAvalaibleQuantity() {
-//        return ingredients.isEmpty() ? 0 : ingredients.stream()
-//                .map(ingredient -> ingredient.getIngredient().getAvalaibleQuantity() / ingredient.getRequiredQuantity())
-//                .max(Comparator.naturalOrder())
-//                .orElse(0.0)
-//                .intValue();
-//    }
+    private List<DishIngredientRest> ingredients = new ArrayList<>();
+
+    public int getAvalaibleQuantity() {
+        return ingredients.isEmpty() ? 0 : ingredients.stream()
+                .map(ingredient -> ingredient.getAvalaibleQuantity() / ingredient.getRequiredQuantity())
+                .min(Comparator.naturalOrder())
+                .orElse(0.0)
+                .intValue();
+    }
 }

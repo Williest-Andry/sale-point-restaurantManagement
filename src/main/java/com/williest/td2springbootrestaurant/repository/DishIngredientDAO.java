@@ -49,7 +49,8 @@ public class DishIngredientDAO implements EntityDAO<DishIngredient> {
         DishIngredient dishIngredient = null;
 
         try (Connection dbConnection = dataSourceDB.getConnection()) {
-            sqlRequest = "SELECT dish_ingredient.id, ingredient.name AS ingredient_name FROM dish_ingredient " +
+            sqlRequest = "SELECT dish_ingredient.id, ingredient.name AS ingredient_name, ingredient_id " +
+                    "FROM dish_ingredient " +
                     "JOIN ingredient ON ingredient.id = dish_ingredient.ingredient_id " +
                     "WHERE dish_id = ?;";
             PreparedStatement select = dbConnection.prepareStatement(sqlRequest);
@@ -58,6 +59,11 @@ public class DishIngredientDAO implements EntityDAO<DishIngredient> {
             while (rs.next()) {
                 dishIngredient = this.findById(rs.getLong("id"));
                 dishIngredient.setName(rs.getString("ingredient_name"));
+
+                Ingredient ingredient = new Ingredient();
+                ingredient.setId(rs.getLong("ingredient_id"));
+                dishIngredient.setIngredient(ingredient);
+
                 dishIngredients.add(dishIngredient);
             }
         }
@@ -95,24 +101,29 @@ public class DishIngredientDAO implements EntityDAO<DishIngredient> {
 
     @Override
     public DishIngredient save(DishIngredient dishIngredient) {
+        Long dishIngredientId = 0L;
         if(dishIngredient.getId() != null){
             this.update(dishIngredient);
         }
         else{
             try(Connection dbconnection = dataSourceDB.getConnection()){
-                sqlRequest = "INSERT INTO dish_ingredient(dish_id, ingredient_id, ingredient_quantity, unit) VALUES(?,?,?,?);";
+                sqlRequest = "INSERT INTO dish_ingredient(dish_id, ingredient_id, ingredient_quantity, unit) " +
+                        "VALUES(?,?,?,?::unit) RETURNING id;";
                 PreparedStatement create = dbconnection.prepareStatement(sqlRequest);
                 create.setLong(1, dishIngredient.getDish().getId());
                 create.setLong(2, dishIngredient.getIngredient().getId());
                 create.setDouble(3, dishIngredient.getRequiredQuantity());
                 create.setString(4, dishIngredient.getIngredient().getUnit().toString());
-                create.executeUpdate();
+                ResultSet rs = create.executeQuery();
+                if(rs.next()){
+                    dishIngredientId = rs.getLong("id");
+                }
             }
             catch(SQLException e){
                 throw new RuntimeException("CAN'T SAVE THE INGREDIENT OF THE DISH: ", e);
             }
         }
-        return this.findById(dishIngredient.getId());
+        return this.findById(dishIngredientId);
     }
 
     @Override
