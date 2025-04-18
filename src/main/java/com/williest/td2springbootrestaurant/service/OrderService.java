@@ -78,7 +78,6 @@ public class OrderService {
             }
             dishOrder.setDish(this.dishDAO.findByName(dishOrder.getDish().getName()));
             order.addDishOrder(dishOrder);
-        System.out.println("eto");
             this.dishOrderDAO.save(dishOrder);
         });
         Order savedOrder = orderDAO.save(order);

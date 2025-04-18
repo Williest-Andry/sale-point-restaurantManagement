@@ -7,6 +7,7 @@ import com.williest.td2springbootrestaurant.model.StockMovementType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
+@ToString
 public class DishIngredientRest {
     private final Long id;
     private final String name;

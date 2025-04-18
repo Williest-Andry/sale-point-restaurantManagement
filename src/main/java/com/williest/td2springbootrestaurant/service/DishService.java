@@ -51,6 +51,7 @@ public class DishService {
             throw new RuntimeException("The list of ingredient can't be empty");
         }
         dishIngredients.forEach(dishIngredient -> {
+            System.out.println(dishIngredient.getName());
             if(this.ingredientDAO.findByName(dishIngredient.getName()) == null){
                 Ingredient ingredient = new Ingredient();
                 ingredient.setName(dishIngredient.getName());

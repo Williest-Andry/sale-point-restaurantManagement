@@ -6,6 +6,7 @@ import com.williest.td2springbootrestaurant.restController.rest.CreateIngredient
 import com.williest.td2springbootrestaurant.restController.rest.DishIngredientRest;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.function.Function;
 
 @Component
@@ -16,10 +17,13 @@ public class DishIngredientMapper implements Function<DishIngredient, DishIngred
     public DishIngredientRest apply(DishIngredient dishIngredient) {
         return new DishIngredientRest(
                 dishIngredient.getId(),
-                dishIngredient.getName(),
+//                dishIngredient.getName(),
+                "test",
                 dishIngredient.getRequiredQuantity(),
-                dishIngredient.getIngredient().getPrices(),
-                dishIngredient.getIngredient().getStocksMovement()
+//                dishIngredient.getIngredient().getPrices(),
+//                dishIngredient.getIngredient().getStocksMovement()
+                new ArrayList<>(),
+                new ArrayList<>()
         );
     }
 

@@ -117,7 +117,7 @@ public class DishOrderDAO implements MakingOrderDAO<DishOrder>{
     @Override
     public DishOrder save(DishOrder dishOrder){
         if(dishOrder.getId() == null){
-            this.create(dishOrder);
+            return this.create(dishOrder);
         }
         else{
             try(Connection dbConnection = dataSource.getConnection();){
@@ -171,7 +171,7 @@ public class DishOrderDAO implements MakingOrderDAO<DishOrder>{
             catch(SQLException e) {
                 throw new RuntimeException("ERROR IN SAVE DishOrder : ",e);
             }
-            return dishOrder;
+            return this.findById(dishOrderId);
         }
         else{
             throw new RuntimeException("CAN'T CREATE dishOrder BECAUSE ORDER STATUS IS : " + dishOrder.getActualStatus());

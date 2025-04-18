@@ -38,6 +38,7 @@ public class DishController {
         try{
             List<Dish> dishes = dishService.getAllDishes();
             List<DishRest> dishesRest = dishes.stream().map(dishRestMapper::apply).toList();
+
             return ResponseEntity.ok().body(dishesRest);
         } catch(Exception e){
             return ResponseEntity.internalServerError().body(e);
@@ -50,6 +51,8 @@ public class DishController {
         try{
             List<DishIngredient> ingredients = ingredientsToCreate.stream().map(dishIngredientMapper::toModel).toList();
             Dish dish = dishService.updateDishIngredients(dishId, ingredients);
+            System.out.println("Dish = " + dish);
+            System.out.println("Mapped = " + dishRestMapper.apply(dish));
             return ResponseEntity.ok().body(dishRestMapper.apply(dish));
         } catch(Exception e){
             return ResponseEntity.internalServerError().body(e);
