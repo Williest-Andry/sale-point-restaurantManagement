@@ -2,13 +2,11 @@ package com.williest.td2springbootrestaurant.repository;
 
 import com.williest.td2springbootrestaurant.model.Dish;
 import com.williest.td2springbootrestaurant.model.Ingredient;
+import com.williest.td2springbootrestaurant.restController.rest.DishBestSale;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -144,9 +142,27 @@ public class DishDAO implements EntityDAO<Dish> {
     public List<Dish> findBestSales(LocalDateTime startDate, LocalDateTime endDate, int numberOfDishes){
         List<Dish> bestDishes = new ArrayList<>();
         try(Connection dbConnection = dataSourceDB.getConnection()){
-            sqlRequest = "select name, count(order_status) as total_sales, (dish_quantity* dish.unit_price) AS total_amount from order_status " +
-                    "join dish_order on dish_order.id=order_status.order_id " +
-                    "join dish on dish.id=dish_order.dish_id group by name, dish.unit_price, dish_quantity order by total_sales desc limit ?;";
+            sqlRequest = "SELECT name, COUNT(order_status) AS total_sales, (dish_quantity* dish.unit_price) AS total_amount FROM order_status " +
+                    "JOIN dish_order ON dish_order.id=order_status.order_id " +
+                    "JOIN dish ON dish.id=dish_order.dish_id " +
+                    "WHERE order_status_date > ? AND order_status_date < ? " +
+                    "GROUP BY name, dish.unit_price, dish_quantity " +
+                    "ORDER BY total_sales DESC LIMIT ?;";
+            PreparedStatement select = dbConnection.prepareStatement(sqlRequest);
+            select.setTimestamp(1, Timestamp.valueOf(startDate));
+            select.setTimestamp(2, Timestamp.valueOf(endDate));
+            select.setInt(3, numberOfDishes);
+            ResultSet rs = select.executeQuery();
+            while (rs.next()) {
+                DishBestSale dish = new DishBestSale();
+                dish.setName(rs.getString("name"));
+                dish.setSalesQuantity(rs.getInt("total_sales"));
+                dish.setTotalAmount(rs.getDouble("total_amount"));
+                dish.setIngredients(new ArrayList<>());
+                dish.setUnitPrice(0.0);
+
+                bestDishes.add(dish);
+            }
         } catch(SQLException e){
             e.printStackTrace();
         }

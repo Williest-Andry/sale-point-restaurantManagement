@@ -10,7 +10,7 @@ import java.util.*;
 public class Dish {
     private Long id;
     private String name;
-    private Double unitPrice;
+    private Double unitPrice = 0.0;
     private List<DishIngredient> ingredients = new ArrayList<>();
 
     public int getAvalaibleQuantity() {
