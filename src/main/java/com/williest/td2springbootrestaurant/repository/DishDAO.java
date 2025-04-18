@@ -145,7 +145,7 @@ public class DishDAO implements EntityDAO<Dish> {
             sqlRequest = "SELECT name, COUNT(order_status) AS total_sales, (dish_quantity* dish.unit_price) AS total_amount FROM order_status " +
                     "JOIN dish_order ON dish_order.id=order_status.order_id " +
                     "JOIN dish ON dish.id=dish_order.dish_id " +
-                    "WHERE order_status = 'DONE' AND order_status_date > ? AND order_status_date < ? " +
+                    "WHERE order_status = 'SERVED' AND order_status_date > ? AND order_status_date < ? " +
                     "GROUP BY name, dish.unit_price, dish_quantity " +
                     "ORDER BY total_sales DESC LIMIT ?;";
             PreparedStatement select = dbConnection.prepareStatement(sqlRequest);
