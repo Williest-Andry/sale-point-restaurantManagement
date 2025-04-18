@@ -17,11 +17,14 @@ public class DishRestMapper implements Function<Dish, DishRest> {
     @Override
     public DishRest apply(Dish dish) {
         List<DishIngredientRest> dishIngredientsRest = dish.getIngredients().stream().map(dishIngredientMapper::apply).toList();
-        return new DishRest(
+        System.out.println("ato");
+        DishRest dishRest = new DishRest(
                 dish.getId(),
                 dish.getName(),
                 dish.getUnitPrice(),
                 dishIngredientsRest
         );
+        System.out.println(dishRest.toString());
+        return dishRest;
     }
 }

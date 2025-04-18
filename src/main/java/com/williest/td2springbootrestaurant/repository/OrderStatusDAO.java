@@ -34,7 +34,6 @@ public class OrderStatusDAO {
                 status.setStatus(Status.valueOf(rs.getString("order_status")));
                 status.setStatusDate(rs.getTimestamp("order_status_date").toLocalDateTime());
                 orderStatus.add(status);
-                System.out.println(status);
             }
         }
         catch(SQLException e){

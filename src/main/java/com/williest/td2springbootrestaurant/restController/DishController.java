@@ -56,17 +56,17 @@ public class DishController {
         }
     }
 
-    @GetMapping("/bestSales")
-    public ResponseEntity<Object> getBestSales(@RequestParam LocalDateTime startDate, @RequestParam LocalDateTime endDate,
-                                   @RequestParam int numberOfDishes){
-        List<Dish> dishes = this.dishService.getBestSales(startDate, endDate, numberOfDishes);
-        List<DishBestSale> dishBestSales = dishes.stream().map(bestDish -> {
-            DishBestSale dish = (DishBestSale) bestDish;
-            dish.setIngredients(new ArrayList<>());
-            dish.setUnitPrice(0.0);
-            return dish;
-        }).toList();
-        List<DishBestSale> bestDishes = dishBestSales.stream().map(this.dishBestSalesMapper::toDishBestSale).toList();
-        return ResponseEntity.ok().body(bestDishes);
-    }
+//    @GetMapping("/bestSales")
+//    public ResponseEntity<Object> getBestSales(@RequestParam LocalDateTime startDate, @RequestParam LocalDateTime endDate,
+//                                   @RequestParam int numberOfDishes){
+//        List<Dish> dishes = this.dishService.getBestSales(startDate, endDate, numberOfDishes);
+//        List<DishBestSale> dishBestSales = dishes.stream().map(bestDish -> {
+//            DishBestSale dish = (DishBestSale) bestDish;
+//            dish.setIngredients(new ArrayList<>());
+//            dish.setUnitPrice(0.0);
+//            return dish;
+//        }).toList();
+//        List<DishBestSale> bestDishes = dishBestSales.stream().map(this.dishBestSalesMapper::toDishBestSale).toList();
+//        return ResponseEntity.ok().body(bestDishes);
+//    }
 }

@@ -1,7 +1,9 @@
 package com.williest.td2springbootrestaurant.repository;
 
+import com.williest.td2springbootrestaurant.model.Dish;
 import com.williest.td2springbootrestaurant.model.DishIngredient;
 import com.williest.td2springbootrestaurant.model.Ingredient;
+import com.williest.td2springbootrestaurant.model.Unit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -24,18 +26,26 @@ public class DishIngredientDAO implements EntityDAO<DishIngredient> {
         DishIngredient dishIngredient= null;
 
         try(Connection dbConnection = dataSourceDB.getConnection()){
-            sqlRequest = "SELECT id, dish_id, ingredient_id, ingredient_quantity, unit FROM dish_ingredient WHERE id=?;";
+            sqlRequest = "SELECT dish_ingredient.id AS dish_ingredient_id, dish_id, ingredient_id, ingredient_quantity," +
+                    "  ingredient.unit ingredient_unit, name, latest_modification " +
+                    "FROM dish_ingredient " +
+                    "JOIN ingredient ON ingredient.id = dish_ingredient.ingredient_id " +
+                    "WHERE dish_ingredient.id=?;";
             PreparedStatement select = dbConnection.prepareStatement(sqlRequest);
             select.setLong(1, id);
             ResultSet rs = select.executeQuery();
             if(rs.next()){
                 dishIngredient = new DishIngredient();
-                dishIngredient.setId(rs.getLong("id"));
+                dishIngredient.setId(rs.getLong("dish_ingredient_id"));
                 dishIngredient.setRequiredQuantity(rs.getDouble("ingredient_quantity"));
-//                Ingredient ingredient = this.ingredientDAO.findById(rs.getLong("ingredient_id"));
-//                dishIngredient.setName(ingredient.getName());
-//                dishIngredient.setIngredient(ingredient);
-//                dishIngredient.setDish(this.dishDAO.findById(rs.getLong("dish_id")));
+
+                Ingredient ingredient = new Ingredient();
+                ingredient.setId(rs.getLong("ingredient_id"));
+                ingredient.setName(rs.getString("name"));
+                ingredient.setUnit(Unit.valueOf(rs.getString("ingredient_unit")));
+                ingredient.setLatestModification(rs.getTimestamp("latest_modification").toLocalDateTime());
+
+                dishIngredient.setIngredient(ingredient);
             }
         }
         catch(SQLException e){
@@ -59,6 +69,10 @@ public class DishIngredientDAO implements EntityDAO<DishIngredient> {
             while (rs.next()) {
                 dishIngredient = this.findById(rs.getLong("id"));
                 dishIngredient.setName(rs.getString("ingredient_name"));
+
+                Dish dish = new Dish();
+                dish.setId(id);
+                dishIngredient.setDish(dish);
 
                 Ingredient ingredient = new Ingredient();
                 ingredient.setId(rs.getLong("ingredient_id"));
@@ -139,6 +153,7 @@ public class DishIngredientDAO implements EntityDAO<DishIngredient> {
             update.setLong(1, dishIngredient.getDish().getId());
             update.setLong(2, dishIngredient.getIngredient().getId());
             update.setDouble(3, dishIngredient.getRequiredQuantity());
+            update.setLong(4, dishIngredient.getId());
             update.executeUpdate();
         }
         catch(SQLException e){

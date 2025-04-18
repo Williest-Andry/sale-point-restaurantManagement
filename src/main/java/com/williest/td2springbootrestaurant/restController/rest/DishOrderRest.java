@@ -2,6 +2,7 @@ package com.williest.td2springbootrestaurant.restController.rest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.williest.td2springbootrestaurant.model.DishOrderStatus;
+import com.williest.td2springbootrestaurant.model.Status;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -19,7 +20,9 @@ public class DishOrderRest {
     private List<DishOrderStatus> dishOrderStatus = new ArrayList<>();
 
     public DishOrderStatus getActualStatus() {
+        DishOrderStatus defaultStatus = new DishOrderStatus();
+        defaultStatus.setStatus(Status.CREATED);
         return dishOrderStatus.stream().max(Comparator.comparing(DishOrderStatus::getStatusDate))
-                .orElse(null);
+                .orElse(defaultStatus);
     }
 }

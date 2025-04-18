@@ -37,17 +37,37 @@ public class DishService {
     public Dish save(Dish dish) {
         Dish dishSaved = dishDAO.save(dish);
         dishSaved.setIngredients(this.dishIngredientDAO.saveAll(dish.getIngredients()));
+        dishSaved.getIngredients().forEach(dishIngredient -> {
+            this.priceDAO.findAllByIngredientId(dishIngredient.getIngredient().getId());
+            this.stockMovementDAO.findAllByIngredientId(dishIngredient.getIngredient().getId());
+        });
         return dishSaved;
     }
 
     public Dish updateDishIngredients(Long dishId, List<DishIngredient> dishIngredients){
         Dish dish = dishDAO.findById(dishId);
+        List<DishIngredient> foundDishIngredient = this.dishIngredientDAO.findDishIngredientByDishId(dishId);
+        if(foundDishIngredient.isEmpty() || dishIngredients.isEmpty()){
+            throw new RuntimeException("The list of ingredient can't be empty");
+        }
         dishIngredients.forEach(dishIngredient -> {
             if(this.ingredientDAO.findByName(dishIngredient.getName()) == null){
-                throw new RuntimeException(dishIngredient.getIngredient().getName()+" not exists");
+                Ingredient ingredient = new Ingredient();
+                ingredient.setName(dishIngredient.getName());
+                ingredient.setUnit(dishIngredient.getIngredient().getUnit());
+                ingredient.setLatestModification(LocalDateTime.now());
+                this.ingredientDAO.save(ingredient);
             }
-            dishIngredient.setIngredient(this.ingredientDAO.findByName(dishIngredient.getName()));
+            else if(this.ingredientDAO.findByName(dishIngredient.getName()) != null){
+                DishIngredient foundIngredient = foundDishIngredient.stream()
+                        .filter(ingredient -> ingredient.getName().equals(dishIngredient.getName())).toList().getFirst();
+                foundDishIngredient.remove(foundIngredient);
+                foundIngredient.setRequiredQuantity(dishIngredient.getRequiredQuantity());
+                foundDishIngredient.add(foundIngredient);
+                dishIngredient.setIngredient(this.ingredientDAO.findByName(dishIngredient.getName()));
+            }
         });
+        this.dishIngredientDAO.saveAll(foundDishIngredient);
         dish.addDishIngredient(dishIngredients);
         return this.save(dish);
     }

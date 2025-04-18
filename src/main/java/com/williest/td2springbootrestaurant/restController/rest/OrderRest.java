@@ -20,7 +20,7 @@ public class OrderRest {
     private List<OrderStatus> orderStatus = new ArrayList<>();
 
     public EntityStatus getActualStatus() {
-       OrderStatus defaultStatus = new OrderStatus();
+        OrderStatus defaultStatus = new OrderStatus();
         defaultStatus.setStatus(Status.CREATED);
         return orderStatus.stream().max(Comparator.comparing(EntityStatus::getStatusDate))
                 .orElse(defaultStatus);
