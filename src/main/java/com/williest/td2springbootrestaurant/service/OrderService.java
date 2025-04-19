@@ -53,17 +53,15 @@ public class OrderService {
         dishOrderStatus.setDishOrder(dishOrderToModify);
         dishOrderStatus.setStatusDate(LocalDateTime.now());
         dishOrderStatus.setStatus(status);
+        dishOrderStatus.setDishOrder(this.dishOrderDAO.findById(dishId));
         dishOrderToModify.addAndUpdateStatus(dishOrderStatus);
         order.getDishOrders().add(dishOrderToModify);
-        System.out.println(dishOrderToModify.getDishOrderStatus());
+        this.dishOrderStatusDAO.saveDishOrderStatus(dishOrderToModify.getActualStatus());
 
         Order savedOrder = orderDAO.save(order);
         savedOrder.setDishOrders(this.dishOrderDAO.saveAll(order.getDishOrders()));
 
-        System.out.println(savedOrder.getDishOrders().size());
         savedOrder.getDishOrders().forEach(dishOrder -> {
-            System.out.println("mety:");
-            System.out.println(dishOrder.getDishOrderStatus());
             this.dishOrderStatusDAO.findAllByDishOrderId(dishOrder.getId());
             this.dishOrderStatusDAO.saveAll(dishOrder.getDishOrderStatus());
         });
