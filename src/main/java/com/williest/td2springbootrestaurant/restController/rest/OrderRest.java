@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class OrderRest {
-    private Long reference;
+    private String reference;
     private List<DishOrderRest> dishOrders;
     @JsonIgnore
     private List<OrderStatus> orderStatus = new ArrayList<>();

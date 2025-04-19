@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class OrderDAO implements MakingOrderDAO<Order>{
                 order = new Order();
                 order.setId(rs.getLong("order_id"));
                 order.setOrderDate(rs.getTimestamp("order_date").toLocalDateTime());
-                order.setReference(rs.getLong("reference"));
+                order.setReference(rs.getString("reference"));
 //                order.setOrderStatus(orderStatusDAO.findAllByOrderId(id));
 //                order.setDishOrders(dishOrderDAO.findAllByOrderId(id));
             }
@@ -38,18 +39,18 @@ public class OrderDAO implements MakingOrderDAO<Order>{
         return order;
     }
 
-    public Order findByReference(Long reference){
+    public Order findByReference(String reference){
         Order order = null;
         try (Connection dbConnection = dataSourceDB.getConnection();) {
             sqlRequest = "SELECT \"order\".id AS order_id, order_date, reference FROM \"order\" WHERE \"order\".reference = ?;";
             PreparedStatement select = dbConnection.prepareStatement(sqlRequest);
-            select.setLong(1, reference);
+            select.setString(1, reference);
             ResultSet rs = select.executeQuery();
             if (rs.next()) {
                 order = new Order();
                 order.setId(rs.getLong("order_id"));
                 order.setOrderDate(rs.getTimestamp("order_date").toLocalDateTime());
-                order.setReference(rs.getLong("reference"));
+                order.setReference(rs.getString("reference"));
 //                order.setOrderStatus(orderStatusDAO.findAllByOrderId(id));
 //                order.setDishOrders(dishOrderDAO.findAllByOrderId(id));
             }
@@ -72,7 +73,7 @@ public class OrderDAO implements MakingOrderDAO<Order>{
                 order = new Order();
                 order.setId(rs.getLong("order_id"));
                 order.setOrderDate(rs.getTimestamp("order_date").toLocalDateTime());
-                order.setReference(rs.getLong("reference"));
+                order.setReference(rs.getString("reference"));
 //                order.setOrderStatus(orderStatusDAO.findAllByOrderId(rs.getLong("order_id")));
 //                order.setDishOrders(dishOrderDAO.findAllByOrderId(rs.getLong("order_id")));
                 orders.add(order);
@@ -85,7 +86,7 @@ public class OrderDAO implements MakingOrderDAO<Order>{
 
     public Order save(Order order) {
         if(this.findById(order.getId()) == null) {
-            this.create(order);
+            return this.create(order);
         }
         else{
             try(Connection dbConnection = dataSourceDB.getConnection()){
@@ -114,9 +115,11 @@ public class OrderDAO implements MakingOrderDAO<Order>{
     public Order create(Order order) {
         Long orderId = 0L;
         try(Connection dbConnection = dataSourceDB.getConnection()){
-            sqlRequest = "INSERT INTO \"order\" (order_date) VALUES (?) RETURNING id;";
+            sqlRequest = "INSERT INTO \"order\" (order_date, reference) VALUES (?,?) RETURNING id;";
             PreparedStatement insert = dbConnection.prepareStatement(sqlRequest);
-            insert.setTimestamp(1, Timestamp.valueOf(order.getOrderDate()));
+            insert.setTimestamp(1, Timestamp.valueOf(order.getOrderDate() != null?
+                    order.getOrderDate() : LocalDateTime.now() ));
+            insert.setString(2, order.getReference());
             ResultSet rs = insert.executeQuery();
             if(rs.next()) {
                 orderId = rs.getLong("id");

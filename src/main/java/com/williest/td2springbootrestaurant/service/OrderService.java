@@ -22,7 +22,7 @@ public class OrderService {
         return orderDAO.findAll();
     }
 
-    public Order getOrderByReference(Long reference){
+    public Order getOrderByReference(String reference){
         Order order = orderDAO.findByReference(reference);
         order.setDishOrders(this.dishOrderDAO.findAllByOrderId(order.getId()));
         order.getDishOrders().forEach(dishOrder -> {
@@ -32,7 +32,7 @@ public class OrderService {
         return order;
     }
 
-    public Order saveOrder(Long reference, Order order){
+    public Order saveOrder(String reference, Order order){
         Order foundOrder = orderDAO.findByReference(reference);
         foundOrder.getDishOrders().clear();
         foundOrder.setDishOrders(order.getDishOrders());
@@ -43,7 +43,7 @@ public class OrderService {
         return savedOrder;
     }
 
-    public Order updateOrderDishStatusById(Long reference, Long dishId, Status status){
+    public Order updateOrderDishStatusById(String reference, Long dishId, Status status){
         Order order = orderDAO.findByReference(reference);
         order.setDishOrders(this.dishOrderDAO.findAllByOrderId(order.getId()));
         DishOrder dishOrderToModify = order.getDishOrders().stream().filter(dishOrder -> dishOrder.getDish().getId().equals(dishId)).toList().getFirst();
@@ -73,7 +73,7 @@ public class OrderService {
         return savedOrder;
     }
 
-    public Order updateDishOrders(Long reference, Order orderToUpdate){
+    public Order updateDishOrders(String reference, Order orderToUpdate){
         if(orderToUpdate.getActualStatus().getStatus() != Status.CREATED
                 && orderToUpdate.getActualStatus().getStatus() != Status.CONFIRMED){
             throw new ClientException("The order status must be CREATED OR CONFIRMED!   ");
@@ -104,5 +104,9 @@ public class OrderService {
 //        this.orderStatusDAO.findAllByOrderId();
         savedOrder.setOrderStatus(List.of(this.orderStatusDAO.saveOrderStatus(orderToUpdate.getActualStatus())));
         return savedOrder;
+    }
+
+    public Order createOrder(Order order){
+        return this.orderDAO.create(order);
     }
 }

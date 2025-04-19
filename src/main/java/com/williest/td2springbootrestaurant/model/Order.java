@@ -13,7 +13,7 @@ import java.util.List;
 public class Order {
     private Long id;
     private LocalDateTime orderDate;
-    private Long reference;
+    private String reference;
     private List<OrderStatus> orderStatus = new ArrayList<>();
     private List<DishOrder> dishOrders = new ArrayList<>();
 

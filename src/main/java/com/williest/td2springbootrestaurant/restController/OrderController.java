@@ -21,7 +21,7 @@ public class OrderController {
 
 
     @GetMapping("/orders/{reference}")
-    public ResponseEntity<Object> getOrderByReference(@PathVariable Long reference) {
+    public ResponseEntity<Object> getOrderByReference(@PathVariable String reference) {
         try{
             OrderRest orderRest = orderRestMapper.apply(orderService.getOrderByReference(reference));
             return ResponseEntity.ok().body(orderRest);
@@ -31,7 +31,7 @@ public class OrderController {
     }
 
     @PutMapping("/orders/{reference}/dishes")
-    public ResponseEntity<Object> updateOrderDishByReference(@PathVariable Long reference,
+    public ResponseEntity<Object> updateOrderDishByReference(@PathVariable String reference,
                                                              @RequestBody CreateOrder createOrder){
         Order order = orderRestMapper.toModel(createOrder);
         OrderRest orderRest = orderRestMapper.apply(orderService.updateDishOrders(reference, order));
@@ -39,11 +39,18 @@ public class OrderController {
     }
 
     @PutMapping("/orders/{reference}/dishes/{dishId}")
-    public ResponseEntity<Object> updateOrderDishStatusByReference(@PathVariable Long reference,
+    public ResponseEntity<Object> updateOrderDishStatusByReference(@PathVariable String reference,
                                                                    @PathVariable Long dishId,
                                                                    @RequestBody CreateStatus createStatus){
 
         Order order = orderService.updateOrderDishStatusById(reference, dishId, this.statusRestMapper.toModel(createStatus).getStatus());
         return ResponseEntity.ok().body(orderRestMapper.apply(order));
+    }
+
+    @PostMapping("/orders/{reference}")
+    public ResponseEntity<Object> createOrder(@PathVariable String reference){
+        Order order = new Order();
+        order.setReference(reference);
+        return ResponseEntity.ok().body(this.orderRestMapper.toBasicRest(orderService.createOrder(order)));
     }
 }
