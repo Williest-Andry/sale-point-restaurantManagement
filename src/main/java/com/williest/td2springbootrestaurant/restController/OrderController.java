@@ -33,7 +33,7 @@ public class OrderController {
     public ResponseEntity<Object> updateOrderDishByReference(@PathVariable Long reference,
                                                              @RequestBody CreateOrder createOrder){
         Order order = orderRestMapper.toModel(createOrder);
-        OrderRest orderRest = orderRestMapper.apply(orderService.updateDishOrders(reference, order.getDishOrders()));
+        OrderRest orderRest = orderRestMapper.apply(orderService.updateDishOrders(reference, order));
         return ResponseEntity.ok().body(orderRest);
     }
 

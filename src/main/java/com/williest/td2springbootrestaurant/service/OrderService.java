@@ -2,6 +2,7 @@ package com.williest.td2springbootrestaurant.service;
 
 import com.williest.td2springbootrestaurant.model.*;
 import com.williest.td2springbootrestaurant.repository.*;
+import com.williest.td2springbootrestaurant.service.exception.ClientException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -69,8 +70,17 @@ public class OrderService {
         return savedOrder;
     }
 
-    public Order updateDishOrders(Long reference, List<DishOrder> dishOrders){
+    public Order updateDishOrders(Long reference, Order orderToUpdate){
+        if(orderToUpdate.getActualStatus().getStatus() != Status.CREATED
+                && orderToUpdate.getActualStatus().getStatus() != Status.CONFIRMED){
+            throw new ClientException("The order status must be CREATED OR CONFIRMED!   ");
+        }
+        List<DishOrder> dishOrders = orderToUpdate.getDishOrders();
         Order order = orderDAO.findByReference(reference);
+        order.setOrderStatus(this.orderStatusDAO.findAllByOrderId(order.getId()));
+        if(order.getActualStatus().getStatus() != Status.CREATED){
+            throw new RuntimeException("Can't update dishOrders because this actual status of the order is not created!");
+        }
         order.getDishOrders().clear();
         dishOrders.forEach(dishOrder -> {
             if(this.dishDAO.findByName(dishOrder.getDish().getName()) == null){
@@ -78,10 +88,18 @@ public class OrderService {
             }
             dishOrder.setDish(this.dishDAO.findByName(dishOrder.getDish().getName()));
             order.addDishOrder(dishOrder);
-            this.dishOrderDAO.save(dishOrder);
+            DishOrder savedDishOrder = this.dishOrderDAO.save(dishOrder);
+            DishOrderStatus dishOrderStatus = new DishOrderStatus();
+            dishOrderStatus.setDishOrder(savedDishOrder);
+            dishOrderStatus.setStatusDate(LocalDateTime.now());
+            dishOrderStatus.setStatus(orderToUpdate.getOrderStatus().getFirst().getStatus());
+            this.dishOrderStatusDAO.saveDishOrderStatus(dishOrderStatus);
         });
         Order savedOrder = orderDAO.save(order);
         savedOrder.setDishOrders(this.dishOrderDAO.findAllByOrderId(savedOrder.getId()));
+        orderToUpdate.getActualStatus().setOrder(savedOrder);
+//        this.orderStatusDAO.findAllByOrderId();
+        savedOrder.setOrderStatus(List.of(this.orderStatusDAO.saveOrderStatus(orderToUpdate.getActualStatus())));
         return savedOrder;
     }
 }

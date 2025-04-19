@@ -17,7 +17,22 @@ public class DishOrderStatusDAO {
     private String sqlRequest;
 
     public DishOrderStatus findById(Long id) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        DishOrderStatus dishOrderStatus = null;
+        try(Connection dbConnection = dataSource.getConnection()){
+            sqlRequest = "SELECT * FROM dish_order_status WHERE id = ?";
+            PreparedStatement select = dbConnection.prepareStatement(sqlRequest);
+            select.setLong(1, id);
+            ResultSet rs = select.executeQuery();
+            if(rs.next()){
+                dishOrderStatus = new DishOrderStatus();
+                dishOrderStatus.setId(id);
+                dishOrderStatus.setStatus(Status.valueOf(rs.getString("dish_order_status")));
+                dishOrderStatus.setStatusDate(rs.getTimestamp("dish_order_status_date").toLocalDateTime());
+            }
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+        return dishOrderStatus;
     }
 
     public List<DishOrderStatus> findAllByDishOrderId(Long dishOrderId) {
@@ -53,7 +68,9 @@ public class DishOrderStatusDAO {
             insert.setTimestamp(3, dishOrderStatus.getStatusDate() != null ? Timestamp.valueOf(dishOrderStatus.getStatusDate()) :
                     Timestamp.valueOf(LocalDateTime.now()));
             ResultSet rs = insert.executeQuery();
-            dishOrderStatusId = rs.getLong("id");
+            if(rs.next()){
+                dishOrderStatusId = rs.getLong("id");
+            }
         }
         catch(SQLException e) {
             throw new RuntimeException("ERROR IN CREATE DISH ORDER STATUS : ",e);
