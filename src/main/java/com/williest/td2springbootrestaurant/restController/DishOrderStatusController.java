@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class DishOrderStatusController {
     private final DishOrderStatusService dishOrderStatusService;
 
-    @GetMapping("/dishOrderStatus/{dishOrderId}")
-    public ResponseEntity<Object> getDishOrderStatusByDishOrderId(@PathVariable Long dishOrderId) {
-        return ResponseEntity.ok().body(this.dishOrderStatusService.getAllByDishOrderId(dishOrderId));
+    @GetMapping("/dishOrderStatus/{dishId}")
+    public ResponseEntity<Object> getDishOrderStatusByDishOrderId(@PathVariable Long dishId) {
+        return ResponseEntity.ok().body(this.dishOrderStatusService.getAllByDishOrderId(dishId));
     }
 }

@@ -56,6 +56,31 @@ public class DishOrderStatusDAO {
         return dishOrderStatusList;
     }
 
+    public List<DishOrderStatus> findAllByDishId(Long dishId){
+        List<DishOrderStatus> dishOrderStatusList = new ArrayList<>();
+        try(Connection dbConnection = dataSource.getConnection()){
+            sqlRequest = "SELECT  dos.* " +
+                    "FROM dish_order_status dos " +
+                    "JOIN dish_order AS dish_order ON dos.dish_order_id = dish_order.id " +
+                    "JOIN dish AS dish ON dish_order.dish_id = dish.id " +
+                    "WHERE dish.id = ?";
+            PreparedStatement select = dbConnection.prepareStatement(sqlRequest);
+            select.setLong(1, dishId);
+            ResultSet rs = select.executeQuery();
+            while(rs.next()){
+                DishOrderStatus dishOrderStatus = new DishOrderStatus();
+//                dishOrderStatus.setId(rs.getLong("id"));
+                dishOrderStatus.setStatus(Status.valueOf(rs.getString("dish_order_status")));
+                dishOrderStatus.setStatusDate(rs.getTimestamp("dish_order_status_date").toLocalDateTime());
+
+                dishOrderStatusList.add(dishOrderStatus);
+            }
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+        return dishOrderStatusList;
+    }
+
     public DishOrderStatus saveDishOrderStatus(DishOrderStatus dishOrderStatus){
         Long dishOrderStatusId = 0L;
         try (Connection dbConnection = dataSource.getConnection()){
@@ -75,6 +100,8 @@ public class DishOrderStatusDAO {
         catch(SQLException e) {
             throw new RuntimeException("ERROR IN CREATE DISH ORDER STATUS : ",e);
         }
+        System.out.println("eto");
+        System.out.println(this.findById(dishOrderStatusId));
         return this.findById(dishOrderStatusId);
     }
 

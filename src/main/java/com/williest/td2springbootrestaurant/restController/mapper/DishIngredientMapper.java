@@ -17,13 +17,13 @@ public class DishIngredientMapper implements Function<DishIngredient, DishIngred
     public DishIngredientRest apply(DishIngredient dishIngredient) {
         return new DishIngredientRest(
                 dishIngredient.getId(),
-//                dishIngredient.getName(),
-                "test",
+                dishIngredient.getName(),
+//                "test",
                 dishIngredient.getRequiredQuantity(),
-//                dishIngredient.getIngredient().getPrices(),
-//                dishIngredient.getIngredient().getStocksMovement()
-                new ArrayList<>(),
-                new ArrayList<>()
+                dishIngredient.getIngredient().getPrices(),
+                dishIngredient.getIngredient().getStocksMovement()
+//                new ArrayList<>(),
+//                new ArrayList<>()
         );
     }
 

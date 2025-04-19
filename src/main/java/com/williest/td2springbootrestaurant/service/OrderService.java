@@ -46,7 +46,7 @@ public class OrderService {
     public Order updateOrderDishStatusById(Long reference, Long dishId, Status status){
         Order order = orderDAO.findByReference(reference);
         order.setDishOrders(this.dishOrderDAO.findAllByOrderId(order.getId()));
-        DishOrder dishOrderToModify = order.getDishOrders().stream().filter(dishOrder -> dishOrder.getDish().getId() == dishId).toList().getFirst();
+        DishOrder dishOrderToModify = order.getDishOrders().stream().filter(dishOrder -> dishOrder.getDish().getId().equals(dishId)).toList().getFirst();
         order.getDishOrders().remove(dishOrderToModify);
 
         DishOrderStatus dishOrderStatus = new DishOrderStatus();
@@ -55,14 +55,17 @@ public class OrderService {
         dishOrderStatus.setStatus(status);
         dishOrderToModify.addAndUpdateStatus(dishOrderStatus);
         order.getDishOrders().add(dishOrderToModify);
-        System.out.println(order.getDishOrders().size());
-            System.out.println(order.getDishOrders().getFirst().getDishOrderStatus().size());
+        System.out.println(dishOrderToModify.getDishOrderStatus());
 
         Order savedOrder = orderDAO.save(order);
         savedOrder.setDishOrders(this.dishOrderDAO.saveAll(order.getDishOrders()));
+
+        System.out.println(savedOrder.getDishOrders().size());
         savedOrder.getDishOrders().forEach(dishOrder -> {
+            System.out.println("mety:");
+            System.out.println(dishOrder.getDishOrderStatus());
+            this.dishOrderStatusDAO.findAllByDishOrderId(dishOrder.getId());
             this.dishOrderStatusDAO.saveAll(dishOrder.getDishOrderStatus());
-            System.out.println(this.dishOrderStatusDAO.saveAll(dishOrder.getDishOrderStatus()).size());
         });
         savedOrder.getDishOrders().forEach(dishOrder -> {
             dishOrder.setDishOrderStatus(this.dishOrderStatusDAO.findAllByDishOrderId(dishOrder.getId()));

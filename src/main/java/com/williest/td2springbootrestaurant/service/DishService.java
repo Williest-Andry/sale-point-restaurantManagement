@@ -36,11 +36,14 @@ public class DishService {
 
     public Dish save(Dish dish) {
         Dish dishSaved = dishDAO.save(dish);
+        System.out.println("eto lo:");
+        System.out.println(dish.getIngredients().size());
         dishSaved.setIngredients(this.dishIngredientDAO.saveAll(dish.getIngredients()));
         dishSaved.getIngredients().forEach(dishIngredient -> {
             this.priceDAO.findAllByIngredientId(dishIngredient.getIngredient().getId());
             this.stockMovementDAO.findAllByIngredientId(dishIngredient.getIngredient().getId());
         });
+        System.out.println(dishSaved);
         return dishSaved;
     }
 
@@ -51,7 +54,6 @@ public class DishService {
             throw new RuntimeException("The list of ingredient can't be empty");
         }
         dishIngredients.forEach(dishIngredient -> {
-            System.out.println(dishIngredient.getName());
             if(this.ingredientDAO.findByName(dishIngredient.getName()) == null){
                 Ingredient ingredient = new Ingredient();
                 ingredient.setName(dishIngredient.getName());

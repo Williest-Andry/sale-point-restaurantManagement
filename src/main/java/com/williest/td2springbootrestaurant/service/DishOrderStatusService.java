@@ -12,7 +12,9 @@ import java.util.List;
 public class DishOrderStatusService {
     private final DishOrderStatusDAO dishOrderStatusDAO;
 
-    public List<DishOrderStatus> getAllByDishOrderId(Long dishOrderId) {
-        return this.dishOrderStatusDAO.findAllByDishOrderId(dishOrderId);
+    public List<DishOrderStatus> getAllByDishOrderId(Long dishId) {
+//        return this.dishOrderStatusDAO.findAllByDishOrderId(dishOrderId);
+        return this.dishOrderStatusDAO.findAllByDishId(dishId);
     }
+
 }

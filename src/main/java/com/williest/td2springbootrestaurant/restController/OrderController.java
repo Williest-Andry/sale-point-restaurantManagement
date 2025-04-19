@@ -19,6 +19,7 @@ public class OrderController {
     private final OrderRestMapper orderRestMapper;
     private final StatusRestMapper statusRestMapper;
 
+
     @GetMapping("/orders/{reference}")
     public ResponseEntity<Object> getOrderByReference(@PathVariable Long reference) {
         try{
